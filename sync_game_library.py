@@ -1,0 +1,133 @@
+import psycopg2
+
+DB_CONFIG = {
+    "host": "localhost",
+    "database": "YouTube_Data",
+    "user": "postgres",
+    "password": "Cheese123"
+}
+
+GAME_LIBRARY = {
+    "minecraft": ["minecraft", "mc"],
+    "roblox": ["roblox"],
+    "fortnite": ["fortnite"],
+    "call of duty": ["cod", "warzone", "black ops", "modern warfare"],
+    "grand theft auto": ["gta", "gta v", "gta 5"],
+    "valorant": ["valorant"],
+    "counter-strike": ["cs2", "csgo", "counter strike"],
+    "league of legends": ["lol", "league"],
+    "world of warcraft": ["wow"],
+    "helldivers 2": ["helldivers"],
+    "elden ring": ["elden ring"],
+    "baldur's gate 3": ["bg3"],
+    "diablo 4": ["diablo iv", "diablo 4"],
+    "marvel rivals": ["marvel rivals"],
+    "overwatch 2": ["overwatch"],
+    "apex legends": ["apex"],
+    "rocket league": ["rocket league"],
+    "destiny 2": ["destiny"],
+    "palworld": ["palworld"],
+    "rainbow six siege": ["r6", "siege"],
+    "dead by daylight": ["dbd"],
+    "escape from tarkov": ["tarkov"],
+    "pubg": ["pubg"],
+    "clash royale": ["clash royale"],
+    "clash of clans": ["clash of clans"],
+    "honkai star rail": ["honkai"],
+    "genshin impact": ["genshin"],
+    "wuthering waves": ["wuthering waves"],
+    "black myth wukong": ["wukong"],
+    "monster hunter wilds": ["monster hunter"],
+    "path of exile": ["poe"],
+    "path of exile 2": ["poe 2"],
+    "nba 2k": ["2k", "nba 2k"],
+    "madden nfl": ["madden"],
+    "ea sports fc": ["ea fc", "fifa"],
+    "the sims 4": ["sims 4"],
+    "cyberpunk 2077": ["cyberpunk"],
+    "terraria": ["terraria"],
+    "stardew valley": ["stardew"],
+    "skyrim": ["skyrim"],
+    "oblivion": ["oblivion"],
+    "fallout 4": ["fallout 4"],
+    "fallout 76": ["fallout 76"],
+    "resident evil 4": ["re4"],
+    "resident evil": ["resident evil"],
+    "dragon ball sparking zero": ["sparking zero"],
+    "dota 2": ["dota"],
+    "warframe": ["warframe"],
+    "delta force": ["delta force"],
+    "rust": ["rust"],
+    "ready or not": ["ready or not"],
+    "war thunder": ["war thunder"],
+    "magic the gathering arena": ["mtg arena"],
+    "arc raiders": ["arc raiders"],
+    "dark souls 3": ["dark souls"],
+    "persona 5 royal": ["persona 5"],
+    "starfield": ["starfield"],
+    "black desert": ["black desert"],
+    "team fortress 2": ["tf2"],
+    "cities skylines 2": ["cities skylines"],
+    "ark survival ascended": ["ark"],
+    "the finals": ["the finals"],
+    "battlefield": ["battlefield"],
+    "final fantasy xiv": ["ffxiv"],
+    "halo mcc": ["halo mcc"],
+    "sea of thieves": ["sea of thieves"],
+    "forza horizon 5": ["forza"],
+    "mortal kombat 1": ["mk1", "mortal kombat"],
+    "street fighter 6": ["sf6", "street fighter"],
+    "tekken 8": ["tekken"],
+    "xdefiant": ["xdefiant"],
+    "dragon ball xenoverse 2": ["xenoverse"],
+    "mount and blade bannerlord": ["bannerlord"],
+    "civilization vi": ["civ 6"],
+    "age of empires iv": ["aoe4"],
+    "total war warhammer 3": ["total war warhammer"],
+    "hades": ["hades"],
+    "hades 2": ["hades 2"],
+    "risk of rain 2": ["risk of rain"],
+    "subnautica": ["subnautica"],
+    "no man's sky": ["no mans sky"],
+    "the witcher 3": ["witcher 3"],
+    "assassin's creed": ["assassins creed"],
+    "far cry 6": ["far cry"],
+    "ghost of tsushima": ["ghost of tsushima"],
+    "spider-man": ["spiderman"],
+    "god of war": ["god of war"],
+    "uncharted": ["uncharted"],
+    "the last of us": ["last of us"],
+    "hogwarts legacy": ["hogwarts"],
+    "star wars jedi survivor": ["jedi survivor"],
+    "star wars battlefront 2": ["battlefront"]
+}
+
+conn = psycopg2.connect(**DB_CONFIG)
+cursor = conn.cursor()
+
+for game_name, aliases in GAME_LIBRARY.items():
+    cursor.execute("""
+        INSERT INTO games (game_name)
+        VALUES (%s)
+        ON CONFLICT (game_name) DO NOTHING;
+    """, (game_name,))
+
+    cursor.execute("""
+        SELECT id FROM games
+        WHERE game_name = %s;
+    """, (game_name,))
+
+    game_id = cursor.fetchone()[0]
+
+    for alias in aliases:
+        cursor.execute("""
+            INSERT INTO game_aliases (game_id, alias)
+            VALUES (%s, %s)
+            ON CONFLICT DO NOTHING;
+        """, (game_id, alias))
+
+conn.commit()
+cursor.close()
+conn.close()
+
+print("Full game library synced to database successfully.")

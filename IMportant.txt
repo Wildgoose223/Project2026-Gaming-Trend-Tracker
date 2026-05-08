@@ -1,0 +1,10 @@
+API_KEY = "FAKE"
+
+DB_CONFIG = {
+    "host": "localhost",
+    "database": "YouTube_Data",
+    "user": "postgres",
+    "password": FAKE"
+}
+
+YOUTUBE = build("youtube", "v3", developerKey=API_KEY)
