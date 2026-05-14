@@ -1,13 +1,13 @@
+
 import os
 import re
-import time
-import requests
 from collections import Counter
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import psycopg2
 from dotenv import load_dotenv
 from googleapiclient.discovery import build
+import requests
 
 
 # =========================
@@ -19,15 +19,6 @@ load_dotenv()
 # =========================
 # CONFIG
 # =========================
-<<<<<<< HEAD
-API_KEY = "Your_API"
-
-DB_CONFIG = {
-    "host": "localhost",
-    "database": "YouTube_Data",
-    "user": "postgres",
-    "password": "YOUR_PW"
-=======
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 RAWG_API_KEY = os.getenv("RAWG_API_KEY")
 
@@ -36,7 +27,6 @@ DB_CONFIG = {
     "database": os.getenv("DB_NAME"),
     "user": os.getenv("DB_USER"),
     "password": os.getenv("DB_PASSWORD")
->>>>>>> c96d184 (Finalize Project2026 with RAWG metadata integration)
 }
 
 if not YOUTUBE_API_KEY:
@@ -49,46 +39,96 @@ if not DB_CONFIG["password"]:
     raise ValueError("Missing DB_PASSWORD in .env file")
 
 
+# =========================
+# YOUTUBE API
+# =========================
 YOUTUBE = build("youtube", "v3", developerKey=YOUTUBE_API_KEY)
-
-RUN_DURATION_HOURS = 1
-PULL_INTERVAL_SECONDS = 600  # 10 minutes
 
 
 # =========================
-# HELPERS
+# GAME LIBRARY
+# =========================
+GAME_LIBRARY = {
+    "minecraft": ["minecraft", "mc"],
+    "roblox": ["roblox"],
+    "fortnite": ["fortnite"],
+    "call of duty": ["call of duty", "cod", "warzone", "black ops", "modern warfare"],
+    "grand theft auto": ["gta", "gta v", "gta 5", "grand theft auto"],
+    "valorant": ["valorant"],
+    "counter-strike": ["cs2", "csgo", "counter strike"],
+    "league of legends": ["league of legends", "lol"],
+    "world of warcraft": ["world of warcraft", "wow"],
+    "elden ring": ["elden ring"],
+    "marvel rivals": ["marvel rivals"],
+    "overwatch 2": ["overwatch", "overwatch 2"],
+    "apex legends": ["apex legends", "apex"],
+    "rocket league": ["rocket league"],
+    "destiny 2": ["destiny 2", "destiny"],
+    "palworld": ["palworld"],
+    "rainbow six siege": ["rainbow six", "r6", "siege"],
+    "helldivers 2": ["helldivers", "helldivers 2"]
+}
+
+
+# =========================
+# CLEAN TEXT
 # =========================
 def clean_text(text):
     text = text.lower()
-    text = re.sub(r"[^a-zA-Z0-9\s]", " ", text)
-    text = re.sub(r"\s+", " ", text).strip()
+    text = re.sub(r"[^a-zA-Z0-9\s]", "", text)
     return text
 
 
-def load_game_library(conn):
-    cursor = conn.cursor()
+# =========================
+# RAWG API LOOKUP
+# =========================
+def fetch_rawg_data(game_name):
+    try:
+        url = "https://api.rawg.io/api/games"
 
-    cursor.execute("""
-        SELECT g.game_name, a.alias
-        FROM games g
-        JOIN game_aliases a ON g.id = a.game_id;
-    """)
+        params = {
+            "key": RAWG_API_KEY,
+            "search": game_name,
+            "page_size": 1
+        }
 
-    rows = cursor.fetchall()
-    cursor.close()
+        response = requests.get(url, params=params, timeout=10)
+        data = response.json()
 
-    game_library = {}
+        if not data.get("results"):
+            return {}
 
-    for game_name, alias in rows:
-        if game_name not in game_library:
-            game_library[game_name] = []
+        game = data["results"][0]
 
-        game_library[game_name].append(clean_text(alias))
+        platforms = ", ".join(
+            p["platform"]["name"]
+            for p in game.get("platforms", [])
+        )
 
-    return game_library
+        genres = ", ".join(
+            g["name"]
+            for g in game.get("genres", [])
+        )
+
+        return {
+            "rawg_name": game.get("name"),
+            "released": game.get("released"),
+            "rating": game.get("rating"),
+            "metacritic": game.get("metacritic"),
+            "platforms": platforms,
+            "genres": genres,
+            "background_image": game.get("background_image")
+        }
+
+    except Exception as e:
+        print(f"RAWG lookup failed for {game_name}: {e}")
+        return {}
 
 
-def fetch_gaming_titles():
+# =========================
+# FETCH TRENDING VIDEOS
+# =========================
+def fetch_trending_videos():
     request = YOUTUBE.videos().list(
         part="snippet",
         chart="mostPopular",
@@ -99,157 +139,54 @@ def fetch_gaming_titles():
 
     response = request.execute()
 
-    return [item["snippet"]["title"] for item in response.get("items", [])]
+    video_titles = []
+
+    for item in response["items"]:
+        title = item["snippet"]["title"]
+        video_titles.append(title)
+
+    return video_titles
 
 
-def match_games(video_titles, game_library):
-    matches = Counter()
+# =========================
+# ANALYZE GAME TRENDS
+# =========================
+def analyze_trends(video_titles):
+    counts = Counter()
 
     for title in video_titles:
         cleaned_title = clean_text(title)
 
-        for game_name, aliases in game_library.items():
+        for game_name, aliases in GAME_LIBRARY.items():
             for alias in aliases:
                 if alias in cleaned_title:
-                    matches[game_name] += 1
+                    counts[game_name] += 1
                     break
 
-    return matches
+    return counts
 
 
-def fetch_rawg_metadata(game_name):
-    url = "https://api.rawg.io/api/games"
-
-    params = {
-        "key": RAWG_API_KEY,
-        "search": game_name,
-        "page_size": 1
-    }
-
-    try:
-        response = requests.get(url, params=params, timeout=10)
-        response.raise_for_status()
-
-        data = response.json()
-
-        if not data.get("results"):
-            return None
-
-        game = data["results"][0]
-
-        platforms = []
-        for item in game.get("platforms", []):
-            platform_name = item.get("platform", {}).get("name")
-            if platform_name:
-                platforms.append(platform_name)
-
-        genres = []
-        for item in game.get("genres", []):
-            genre_name = item.get("name")
-            if genre_name:
-                genres.append(genre_name)
-
-        return {
-            "rawg_id": game.get("id"),
-            "rawg_name": game.get("name"),
-            "released": game.get("released"),
-            "rating": game.get("rating"),
-            "metacritic": game.get("metacritic"),
-            "platforms": ", ".join(platforms),
-            "genres": ", ".join(genres),
-            "background_image": game.get("background_image")
-        }
-
-    except Exception as e:
-        print(f"RAWG error for {game_name}: {e}")
-        return None
-
-
-def save_unknown_terms(video_titles, game_library, conn):
+# =========================
+# SAVE TO DATABASE
+# =========================
+def save_to_database(counts, total_videos):
+    conn = psycopg2.connect(**DB_CONFIG)
     cursor = conn.cursor()
 
-    stop_words = {
-        "the", "and", "for", "with", "this", "that",
-        "from", "your", "you", "are", "was", "have",
-        "has", "had", "get", "got", "new", "best",
-        "top", "today", "video", "videos", "gaming",
-        "game", "games", "play", "playing", "player",
-        "players", "stream", "streamer", "live",
-        "update", "updates", "official", "review",
-        "friends", "friend", "block", "life",
-        "free", "every", "there", "episode",
-        "world", "lucky", "crazy", "funny",
-        "insane", "clips", "moments", "wins",
-        "fails", "challenge", "shorts", "short",
-        "vs", "win", "lose", "loses", "lost",
-        "using", "use", "make", "made", "making",
-        "watch", "watching", "shows", "show",
-        "react", "reaction", "trailer"
-    }
+    current_time = datetime.now()
 
-    all_known_aliases = set()
-    for aliases in game_library.values():
-        all_known_aliases.update(aliases)
+    for game_name, mentions in counts.items():
+        percentage = round((mentions / total_videos) * 100, 2)
 
-    for title in video_titles:
-        words = clean_text(title).split()
-
-        for word in words:
-            if len(word) < 4 or word in stop_words or word in all_known_aliases:
-                continue
-
-            cursor.execute("""
-                INSERT INTO unknown_terms (term, count)
-                VALUES (%s, 1)
-                ON CONFLICT (term)
-                DO UPDATE SET
-                    count = unknown_terms.count + 1,
-                    last_seen = CURRENT_TIMESTAMP
-            """, (word,))
-
-    conn.commit()
-    cursor.close()
-
-
-def save_to_db(game_matches, total_videos, conn):
-    cursor = conn.cursor()
-    run_time = datetime.now()
-
-    top_games = game_matches.most_common(10)
-
-    for game, count in top_games:
-        percentage = round((count / total_videos) * 100, 2)
-
-        metadata = fetch_rawg_metadata(game)
-
-        rawg_id = None
-        rawg_name = None
-        released = None
-        rating = None
-        metacritic = None
-        platforms = None
-        genres = None
-        background_image = None
-
-        if metadata:
-            rawg_id = metadata["rawg_id"]
-            rawg_name = metadata["rawg_name"]
-            released = metadata["released"]
-            rating = metadata["rating"]
-            metacritic = metadata["metacritic"]
-            platforms = metadata["platforms"]
-            genres = metadata["genres"]
-            background_image = metadata["background_image"]
+        rawg_data = fetch_rawg_data(game_name)
 
         cursor.execute("""
-            INSERT INTO trending_games
-            (
-                run_time,
+            INSERT INTO trending_games (
                 game_name,
                 mentions,
                 total_videos,
                 percentage,
-                rawg_id,
+                run_time,
                 rawg_name,
                 released,
                 rating,
@@ -258,125 +195,47 @@ def save_to_db(game_matches, total_videos, conn):
                 genres,
                 background_image
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """, (
-            run_time,
-            game,
-            count,
+            game_name,
+            mentions,
             total_videos,
             percentage,
-            rawg_id,
-            rawg_name,
-            released,
-            rating,
-            metacritic,
-            platforms,
-            genres,
-            background_image
+            current_time,
+            rawg_data.get("rawg_name"),
+            rawg_data.get("released"),
+            rawg_data.get("rating"),
+            rawg_data.get("metacritic"),
+            rawg_data.get("platforms"),
+            rawg_data.get("genres"),
+            rawg_data.get("background_image")
         ))
 
     conn.commit()
     cursor.close()
+    conn.close()
 
 
-def compare_latest_runs(conn):
-    cursor = conn.cursor()
-
-    cursor.execute("""
-        SELECT DISTINCT run_time
-        FROM trending_games
-        ORDER BY run_time DESC
-        LIMIT 2;
-    """)
-
-    runs = cursor.fetchall()
-
-    if len(runs) < 2:
-        print("\nNot enough data yet to compare.")
-        cursor.close()
-        return
-
-    current_run, previous_run = runs[0][0], runs[1][0]
-
-    cursor.execute("""
-        SELECT
-            current.game_name,
-            current.mentions,
-            current.percentage,
-            COALESCE(previous.mentions, 0),
-            current.mentions - COALESCE(previous.mentions, 0),
-            current.platforms,
-            current.genres,
-            current.metacritic
-        FROM trending_games current
-        LEFT JOIN trending_games previous
-            ON current.game_name = previous.game_name
-            AND previous.run_time = %s
-        WHERE current.run_time = %s
-        ORDER BY current.mentions DESC
-        LIMIT 10;
-    """, (previous_run, current_run))
-
-    print("\nTop 10 Trending Games Right Now:\n")
-
-    for game, mentions, pct, prev, change, platforms, genres, metacritic in cursor.fetchall():
-        trend = "Trending Up" if change > 0 else "Declining" if change < 0 else "Stable"
-
-        print(f"{game} — {mentions} videos ({pct}%) | Change: {change} — {trend}")
-
-        if platforms:
-            print(f"Platforms: {platforms}")
-
-        if genres:
-            print(f"Genres: {genres}")
-
-        if metacritic:
-            print(f"Metacritic: {metacritic}")
-
-        print("-" * 60)
-
-    cursor.close()
-
-
-def run_single_pull():
-    with open("run_log.txt", "a") as f:
-        f.write(f"Run at {datetime.now()}\n")
-
-    conn = None
-
-    try:
-        conn = psycopg2.connect(**DB_CONFIG)
-
-        game_library = load_game_library(conn)
-        titles = fetch_gaming_titles()
-
-        matches = match_games(titles, game_library)
-
-        save_unknown_terms(titles, game_library, conn)
-        save_to_db(matches, len(titles), conn)
-        compare_latest_runs(conn)
-
-    except Exception as e:
-        print(f"Script error: {e}")
-
-    finally:
-        if conn:
-            conn.close()
-
-
+# =========================
+# MAIN
+# =========================
 def main():
-    end_time = datetime.now() + timedelta(hours=RUN_DURATION_HOURS)
+    print("Fetching trending YouTube gaming videos...")
 
-    print("Collector started\n")
+    video_titles = fetch_trending_videos()
 
-    while datetime.now() < end_time:
-        print(f"\nRunning pull at {datetime.now()}")
-        run_single_pull()
+    print(f"Fetched {len(video_titles)} videos.")
 
-        if datetime.now() < end_time:
-            time.sleep(PULL_INTERVAL_SECONDS)
+    counts = analyze_trends(video_titles)
 
-    print("\nFinished 1-hour session.")
+    print("\nTrending Games:")
+
+    for game, mentions in counts.most_common():
+        print(f"{game}: {mentions}")
+
+    save_to_database(counts, len(video_titles))
+
+    print("\nTrend data saved successfully.")
 
 
 if __name__ == "__main__":
