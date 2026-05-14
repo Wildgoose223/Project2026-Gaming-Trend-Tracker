@@ -195,7 +195,7 @@ def generate_dashboard():
 
                     <div>
                         <span class="stat-value">{item["percentage"]}%</span>
-                        <span class="stat-label">% of Today's Videos</span>
+                        <span class="stat-label">Of Today's Trending Videos</span>
                     </div>
 
                     <div>
@@ -205,8 +205,8 @@ def generate_dashboard():
                 </div>
 
                 <p class="meaning">
-                    Appeared in <strong>{item["mentions"]}</strong> matched trending videos today,
-                    across <strong>{item["total_videos"]}</strong> total YouTube Gaming videos checked.
+                    <strong>{item["display_name"]}</strong> appeared in 
+                    <strong>{item["percentage"]}%</strong> of all trending YouTube Gaming videos collected today.
                 </p>
 
                 <p class="trend {item["trend_label"].replace(" ", "-").lower()}">
@@ -440,8 +440,8 @@ def generate_dashboard():
     <div class="container">
         <section class="summary-box">
             <strong>How to read this dashboard:</strong>
-            This dashboard now summarizes the whole day instead of only showing the latest pull.
-            If the script runs multiple times today, the dashboard combines those pulls into one daily trend view.
+            This dashboard shows what percentage of today's collected trending YouTube Gaming videos each game appeared in.
+            For example, if a game shows 24%, that means it appeared in 24% of the trending videos collected today.
 
             <div class="summary-grid">
                 <div class="summary-stat">
@@ -451,7 +451,7 @@ def generate_dashboard():
 
                 <div class="summary-stat">
                     <span>{total_videos_today}</span>
-                    <small>Total Videos Checked Today</small>
+                    <small>Total Trending Videos Checked Today</small>
                 </div>
 
                 <div class="summary-stat">
