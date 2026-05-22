@@ -12,7 +12,7 @@ load_dotenv()
 
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 
-DB_NAME = os.getenv("DB_NAME", "YouTube_Data")
+DB_NAME = os.getenv("DB_NAME", "Gaming_Trend_Tracker")
 DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_HOST = os.getenv("DB_HOST", "localhost")
@@ -37,14 +37,14 @@ MANUAL_GAME_LIBRARY = {
     "rainbow six siege": ["rainbow six", "rainbow 6", "r6 siege", "siege"],
     "counter-strike 2": ["counter strike", "counter-strike", "cs2", "csgo"],
     "subnautica": ["subnautica", "subnautica 2"],
-    "baldi's basics": ["baldi's basics", "baldi's basics plus"],
+    "baldi's basics": ["baldi's basics", "baldis basics", "baldi's basics plus"],
     "clash royale": ["clash royale"],
     "brawl stars": ["brawl stars"],
     "darktide": ["darktide", "warhammer darktide"],
-    "rust": ["rust"],
     "forza horizon": ["forza horizon", "forza horizon 6", "fh6"],
     "dayz": ["dayz"],
     "escape from tarkov": ["escape from tarkov", "tarkov"],
+    "rust": ["rust"]
 }
 
 
@@ -105,16 +105,6 @@ def create_tables(conn):
         """)
 
         cur.execute("""
-            ALTER TABLE trending_games
-            ADD COLUMN IF NOT EXISTS platform VARCHAR(50) DEFAULT 'YouTube',
-            ADD COLUMN IF NOT EXISTS game_name VARCHAR(255),
-            ADD COLUMN IF NOT EXISTS mentions INTEGER,
-            ADD COLUMN IF NOT EXISTS percentage NUMERIC(6,2),
-            ADD COLUMN IF NOT EXISTS total_videos INTEGER,
-            ADD COLUMN IF NOT EXISTS run_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
-        """)
-
-        cur.execute("""
             CREATE TABLE IF NOT EXISTS raw_youtube_videos (
                 id SERIAL PRIMARY KEY,
                 video_id TEXT,
@@ -126,15 +116,6 @@ def create_tables(conn):
         """)
 
         cur.execute("""
-            ALTER TABLE raw_youtube_videos
-            ADD COLUMN IF NOT EXISTS video_id TEXT,
-            ADD COLUMN IF NOT EXISTS title TEXT,
-            ADD COLUMN IF NOT EXISTS tags TEXT,
-            ADD COLUMN IF NOT EXISTS matched_games TEXT DEFAULT 'UNMATCHED',
-            ADD COLUMN IF NOT EXISTS run_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
-        """)
-
-        cur.execute("""
             CREATE TABLE IF NOT EXISTS unknown_terms (
                 id SERIAL PRIMARY KEY,
                 term TEXT UNIQUE,
@@ -142,30 +123,6 @@ def create_tables(conn):
                 platform VARCHAR(50) DEFAULT 'YouTube',
                 detected_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
-        """)
-
-        cur.execute("""
-            ALTER TABLE unknown_terms
-            ADD COLUMN IF NOT EXISTS term TEXT,
-            ADD COLUMN IF NOT EXISTS source_title TEXT,
-            ADD COLUMN IF NOT EXISTS platform VARCHAR(50) DEFAULT 'YouTube',
-            ADD COLUMN IF NOT EXISTS detected_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
-        """)
-
-        cur.execute("""
-            CREATE TABLE IF NOT EXISTS game_aliases (
-                id SERIAL PRIMARY KEY,
-                game_name TEXT,
-                alias TEXT UNIQUE,
-                source TEXT DEFAULT 'MANUAL'
-            );
-        """)
-
-        cur.execute("""
-            ALTER TABLE game_aliases
-            ADD COLUMN IF NOT EXISTS game_name TEXT,
-            ADD COLUMN IF NOT EXISTS alias TEXT,
-            ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'MANUAL';
         """)
 
     conn.commit()
@@ -181,17 +138,33 @@ def load_game_library(conn):
             WHERE game_name IS NOT NULL
               AND alias IS NOT NULL;
         """)
+        alias_rows = cur.fetchall()
 
-        rows = cur.fetchall()
+        cur.execute("""
+            SELECT game_name, normalized_name
+            FROM steam_games
+            WHERE game_name IS NOT NULL
+              AND normalized_name IS NOT NULL;
+        """)
+        steam_rows = cur.fetchall()
 
-    for game_name, alias in rows:
+    for game_name, alias in alias_rows:
         clean_game = clean_text(game_name)
         clean_alias = clean_text(alias)
 
-        if not clean_game or not clean_alias:
+        if not clean_game or not clean_alias or len(clean_alias) < 3:
             continue
 
-        if len(clean_alias) < 3:
+        if clean_game not in game_library:
+            game_library[clean_game] = set()
+
+        game_library[clean_game].add(clean_alias)
+
+    for game_name, normalized_name in steam_rows:
+        clean_game = clean_text(game_name)
+        clean_alias = clean_text(normalized_name)
+
+        if not clean_game or not clean_alias or len(clean_alias) < 3:
             continue
 
         if clean_game not in game_library:
@@ -328,7 +301,7 @@ def main():
     create_tables(conn)
 
     game_library = load_game_library(conn)
-    print(f"Loaded {len(game_library)} games from local library.")
+    print(f"Loaded {len(game_library)} games from RAWG/manual aliases + Steam library.")
 
     items = fetch_youtube_videos()
 
@@ -372,12 +345,13 @@ def main():
         print(f"{game}: {count}/{total_videos} videos — {percentage}%")
 
     print()
-    print("Next check:")
+    print("Check unmatched videos with:")
     print("""
-SELECT matched_games, COUNT(*) AS videos
+SELECT title, tags
 FROM raw_youtube_videos
-GROUP BY matched_games
-ORDER BY videos DESC;
+WHERE matched_games = 'UNMATCHED'
+ORDER BY run_timestamp DESC
+LIMIT 25;
 """)
 
 

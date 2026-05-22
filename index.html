@@ -1,636 +1,613 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Project2026 Gaming Trend Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<title>Project2026 Gaming Trend Tracker</title>
+<style>
+body {
+    background:
+        radial-gradient(circle at top left, rgba(56,189,248,.16), transparent 30%),
+        radial-gradient(circle at top right, rgba(99,102,241,.14), transparent 28%),
+        linear-gradient(135deg, #020617, #0f172a 50%, #111827);
+    color: #e5e7eb;
+    font-family: Arial, sans-serif;
+    padding: 24px;
+    margin: 0;
+}
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #0f172a;
-            color: #e5e7eb;
-        }
+h1 {
+    color: #38bdf8;
+    margin-bottom: 4px;
+}
 
-        header {
-            padding: 32px;
-            text-align: center;
-            background: #111827;
-            border-bottom: 1px solid #334155;
-        }
+.subtitle {
+    color: #94a3b8;
+    margin-bottom: 16px;
+}
 
-        header h1 {
-            margin: 0;
-            font-size: 36px;
-        }
+.buttons a {
+    display: inline-block;
+    background: #1e293b;
+    color: white;
+    padding: 10px 16px;
+    margin-right: 8px;
+    border-radius: 8px;
+    text-decoration: none;
+    border: 1px solid #334155;
+}
 
-        header p {
-            color: #94a3b8;
-            margin-top: 8px;
-        }
+.panel,
+.game-card {
+    background: rgba(15,23,42,.94);
+    border: 1px solid #334155;
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0,0,0,.28);
+}
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 32px;
-        }
+.panel {
+    padding: 18px;
+    margin-top: 18px;
+}
 
-        .summary-box {
-            background: #111827;
-            border: 1px solid #334155;
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 32px;
-            color: #cbd5e1;
-            line-height: 1.6;
-        }
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+}
 
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-            margin-top: 18px;
-        }
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-top: 18px;
+}
 
-        .summary-stat {
-            background: #020617;
-            border: 1px solid #1e293b;
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-        }
+.explain {
+    color: #cbd5e1;
+    line-height: 1.5;
+}
 
-        .summary-stat span {
-            display: block;
-            font-size: 28px;
-            font-weight: bold;
-            color: #38bdf8;
-        }
+.summary-text {
+    color: #dbeafe;
+    line-height: 1.6;
+    background: rgba(2,6,23,.45);
+    border-left: 4px solid #38bdf8;
+    padding: 14px;
+    border-radius: 10px;
+}
 
-        .summary-stat small {
-            color: #94a3b8;
-        }
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+}
 
-        .chart-section {
-            background: #111827;
-            padding: 24px;
-            border-radius: 16px;
-            margin-bottom: 32px;
-            border: 1px solid #334155;
-        }
+th,
+td {
+    border-bottom: 1px solid #334155;
+    padding: 10px;
+    text-align: left;
+}
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
-            gap: 24px;
-        }
+th {
+    color: #38bdf8;
+}
 
-        .game-card {
-            background: #111827;
-            border: 1px solid #334155;
-            border-radius: 18px;
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-        }
+.up {
+    color: #4ade80;
+}
 
-        .game-image {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-            display: block;
-        }
+.down {
+    color: #f87171;
+}
 
-        .game-content {
-            padding: 20px;
-        }
+.stable {
+    color: #facc15;
+}
 
-        .rank {
-            color: #38bdf8;
-            font-weight: bold;
-            font-size: 18px;
-        }
+.game-card {
+    overflow: hidden;
+}
 
-        h2 {
-            margin: 8px 0;
-            font-size: 24px;
-        }
+.game-img {
+    width: 100%;
+    height: 145px;
+    object-fit: cover;
+    display: block;
+}
 
-        .subtitle {
-            color: #94a3b8;
-            font-size: 14px;
-        }
+.placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1e3a8a, #020617);
+    color: #93c5fd;
+    font-size: 22px;
+    font-weight: bold;
+}
 
-        .stats {
-            display: flex;
-            justify-content: space-between;
-            margin: 20px 0;
-            gap: 12px;
-        }
+.card-body {
+    padding: 16px;
+}
 
-        .stats div {
-            background: #1e293b;
-            padding: 12px;
-            border-radius: 12px;
-            text-align: center;
-            flex: 1;
-        }
+.card-body h3 {
+    margin: 0 0 8px 0;
+    font-size: 22px;
+}
 
-        .stat-value {
-            display: block;
-            font-size: 22px;
-            font-weight: bold;
-        }
+.description {
+    color: #cbd5e1;
+    font-size: 13px;
+    line-height: 1.45;
+    min-height: 58px;
+}
 
-        .stat-label {
-            display: block;
-            color: #94a3b8;
-            font-size: 12px;
-            margin-top: 4px;
-        }
+.mini-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: 14px 0;
+}
 
-        .meaning {
-            background: #020617;
-            border: 1px solid #1e293b;
-            padding: 12px;
-            border-radius: 12px;
-            color: #cbd5e1;
-            font-size: 14px;
-            line-height: 1.5;
-        }
+.mini-stats div {
+    background: #020617;
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+}
 
-        .trend {
-            display: inline-block;
-            padding: 8px 12px;
-            border-radius: 999px;
-            font-weight: bold;
-            font-size: 13px;
-            margin-top: 10px;
-        }
+.mini-stats strong {
+    display: block;
+    color: white;
+    font-size: 15px;
+}
 
-        .trending-up {
-            background: #064e3b;
-            color: #6ee7b7;
-        }
+.mini-stats span {
+    font-size: 10px;
+    color: #94a3b8;
+}
 
-        .declining {
-            background: #7f1d1d;
-            color: #fecaca;
-        }
+.status {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    background: #020617;
+    border: 1px solid #334155;
+}
 
-        .stable {
-            background: #334155;
-            color: #cbd5e1;
-        }
+.meta p {
+    color: #cbd5e1;
+    font-size: 12px;
+    margin: 6px 0;
+}
 
-        .metadata {
-            margin-top: 18px;
-            font-size: 14px;
-            color: #cbd5e1;
-            line-height: 1.5;
-        }
+.meta strong {
+    color: #38bdf8;
+}
 
-        .metadata p {
-            margin: 8px 0;
-        }
+li {
+    margin: 7px 0;
+}
 
-        footer {
-            text-align: center;
-            color: #64748b;
-            padding: 24px;
-            font-size: 13px;
-        }
-    </style>
+@media (max-width: 1000px) {
+    .grid,
+    .card-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
 </head>
 
 <body>
-    <header>
-        <h1>Project2026 Gaming Trend Dashboard</h1>
-        <p>Daily gaming trend summary from YouTube Gaming, enriched with RAWG metadata</p>
-        <p>Last updated: 2026-05-22 11:50:24</p>
-    </header>
 
-    <div class="container">
-        <section class="summary-box">
-            <strong>How to read this dashboard:</strong>
-            This dashboard shows what percentage of today's collected trending YouTube Gaming videos each game appeared in.
-            For example, if a game shows 24%, that means it appeared in 24% of the trending videos collected today.
+<h1>Project2026 Gaming Trend Tracker</h1>
+<p class="subtitle">Tracking gaming trends across YouTube, Steam, RAWG-style metadata, and future sources.</p>
 
-            <div class="summary-grid">
-                <div class="summary-stat">
-                    <span>8</span>
-                    <small>Pulls Today</small>
-                </div>
+<div class="buttons">
+    <a href="dashboard_today.html">Today</a>
+    <a href="dashboard_week.html">7 Days</a>
+    <a href="dashboard_month.html">30 Days</a>
+</div>
 
-                <div class="summary-stat">
-                    <span>242</span>
-                    <small>Total Trending Videos Checked Today</small>
-                </div>
+<div class="panel">
+    <h2>Current View: Last 7 Days</h2>
+    <p class="explain">
+        YouTube shows content attention. Steam shows active player demand.
+        RAWG-style cards explain what each game is, what platforms it is on, and why it matters.
+    </p>
+</div>
 
-                <div class="summary-stat">
-                    <span>10</span>
-                    <small>Top Games Displayed</small>
-                </div>
-            </div>
-        </section>
+<div class="panel">
+    <h2>Trend Summary</h2>
+    <div class="summary-text">
+        
+    <p>
+        <strong>Minecraft</strong> is leading YouTube attention, while
+        <strong>Counter-Strike 2</strong> is leading Steam player demand.
+    </p>
+    <p>
+        Games appearing on both lists are stronger trend signals because they have both content attention and active players.
+        Steam-only games matter too because they may be popular with players even if YouTube is not talking about them much.
+    </p>
+    <p><strong>Hot on both:</strong> Grand Theft Auto, Marvel Rivals, Rainbow Six Siege</p><p><strong>Steam breakout signal:</strong> Apex Legends, Counter-Strike 2, Dota 2, Pubg, Rust</p>
+    </div>
+</div>
 
-        <section class="chart-section">
-            <canvas id="trendChart"></canvas>
-        </section>
+<div class="grid">
+    <div class="panel">
+        <h2>YouTube Trend Graph</h2>
+        <div>                        <script>window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.5.0.min.js" integrity="sha256-fHbNLP+GlIXN+efbQec78UkemUz3NJp7UmfGxC1tNxs=" crossorigin="anonymous"></script>                <div id="eec50be3-1b5a-4208-a47b-61e2611a9633" class="plotly-graph-div" style="height:340px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("eec50be3-1b5a-4208-a47b-61e2611a9633")) {                    Plotly.newPlot(                        "eec50be3-1b5a-4208-a47b-61e2611a9633",                        [{"hovertemplate":"game_name=%{x}\u003cbr\u003eyoutube_mentions=%{text}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"","marker":{"color":"#636efa","pattern":{"shape":""}},"name":"","orientation":"v","showlegend":false,"text":{"dtype":"f8","bdata":"AAAAAACskUAAAAAAADyRQAAAAAAAIGpAAAAAAACAWUAAAAAAAIBVQAAAAAAAgEhAAAAAAAAAR0AAAAAAAABGQAAAAAAAAEFAAAAAAACAQEA="},"textposition":"auto","x":["minecraft","roblox","grand theft auto","subnautica","call of duty","rainbow six siege","destiny 2","marvel rivals","league of legends","among us"],"xaxis":"x","y":{"dtype":"i2","bdata":"awRPBNEAZgBWADEALgAsACIAIQA="},"yaxis":"y","type":"bar"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#f2f5fa"},"error_y":{"color":"#f2f5fa"},"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"baxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"line":{"color":"#283442"}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"marker":{"line":{"color":"#283442"}},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#506784"},"line":{"color":"rgb(17,17,17)"}},"header":{"fill":{"color":"#2a3f5f"},"line":{"color":"rgb(17,17,17)"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#f2f5fa","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#f2f5fa"},"geo":{"bgcolor":"rgb(17,17,17)","lakecolor":"rgb(17,17,17)","landcolor":"rgb(17,17,17)","showlakes":true,"showland":true,"subunitcolor":"#506784"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"dark"},"paper_bgcolor":"rgb(17,17,17)","plot_bgcolor":"rgb(17,17,17)","polar":{"angularaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","radialaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"yaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"zaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"}},"shapedefaults":{"line":{"color":"#f2f5fa"}},"sliderdefaults":{"bgcolor":"#C8D4E3","bordercolor":"rgb(17,17,17)","borderwidth":1,"tickwidth":0},"ternary":{"aaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"baxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","caxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"title":{"x":0.05},"updatemenudefaults":{"bgcolor":"#506784","borderwidth":0},"xaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"game_name"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"youtube_mentions"}},"legend":{"tracegroupgap":0},"title":{"text":"YouTube Mentions - Last 7 Days"},"barmode":"relative","margin":{"l":30,"r":30,"t":55,"b":40},"height":340,"paper_bgcolor":"#111827","plot_bgcolor":"#111827"},                        {"responsive": true}                    )                };            </script>        </div>
+    </div>
 
-        <section class="grid">
-            
+    <div class="panel">
+        <h2>Steam Player Graph</h2>
+        <div>                        <script>window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.5.0.min.js" integrity="sha256-fHbNLP+GlIXN+efbQec78UkemUz3NJp7UmfGxC1tNxs=" crossorigin="anonymous"></script>                <div id="c4d637d1-103d-4c1a-b253-ca9a53d69f27" class="plotly-graph-div" style="height:340px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("c4d637d1-103d-4c1a-b253-ca9a53d69f27")) {                    Plotly.newPlot(                        "c4d637d1-103d-4c1a-b253-ca9a53d69f27",                        [{"hovertemplate":"game_name=%{x}\u003cbr\u003ecurrent_players=%{text}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"","marker":{"color":"#636efa","pattern":{"shape":""}},"name":"","orientation":"v","showlegend":false,"text":{"dtype":"f8","bdata":"AAAAAPTCMkEAAAAAxNQgQQAAAABYORVBAAAAABgMAkEAAAAAYOr4QAAAAACQyvJAAAAAAHC48kAAAAAA8FvwQAAAAABAM+9AAAAAAEDB6kA="},"textposition":"auto","x":["counter-strike 2","dota 2","pubg","rust","apex legends","grand theft auto","marvel rivals","stardew valley","rainbow six siege","warframe"],"xaxis":"x","y":{"dtype":"i4","bdata":"9MISAGJqCABWTgUAg0ECAKaOAQCpLAEAhysBAL8FAQCa+QAACtYAAA=="},"yaxis":"y","type":"bar"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#f2f5fa"},"error_y":{"color":"#f2f5fa"},"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"baxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"line":{"color":"#283442"}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"marker":{"line":{"color":"#283442"}},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#506784"},"line":{"color":"rgb(17,17,17)"}},"header":{"fill":{"color":"#2a3f5f"},"line":{"color":"rgb(17,17,17)"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#f2f5fa","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#f2f5fa"},"geo":{"bgcolor":"rgb(17,17,17)","lakecolor":"rgb(17,17,17)","landcolor":"rgb(17,17,17)","showlakes":true,"showland":true,"subunitcolor":"#506784"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"dark"},"paper_bgcolor":"rgb(17,17,17)","plot_bgcolor":"rgb(17,17,17)","polar":{"angularaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","radialaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"yaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"zaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"}},"shapedefaults":{"line":{"color":"#f2f5fa"}},"sliderdefaults":{"bgcolor":"#C8D4E3","bordercolor":"rgb(17,17,17)","borderwidth":1,"tickwidth":0},"ternary":{"aaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"baxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","caxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"title":{"x":0.05},"updatemenudefaults":{"bgcolor":"#506784","borderwidth":0},"xaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"game_name"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"current_players"}},"legend":{"tracegroupgap":0},"title":{"text":"Steam Current Players"},"barmode":"relative","margin":{"l":30,"r":30,"t":55,"b":40},"height":340,"paper_bgcolor":"#111827","plot_bgcolor":"#111827"},                        {"responsive": true}                    )                };            </script>        </div>
+    </div>
+</div>
+
+<div class="grid">
+    <div class="panel">
+        <h2>YouTube Trends</h2>
+        <p class="explain">Content attention: what people are watching and talking about.</p>
+        
+    <table>
+        <tr>
+            <th>Rank</th>
+            <th>Game</th>
+            <th>YouTube Mentions</th>
+            <th>Momentum</th>
+        </tr>
+        
+        <tr>
+            <td>#1</td>
+            <td>Minecraft</td>
+            <td>1,131</td>
+            <td class="down">Declining (-3)</td>
+        </tr>
+        
+        <tr>
+            <td>#2</td>
+            <td>Roblox</td>
+            <td>1,103</td>
+            <td class="down">Declining (-4)</td>
+        </tr>
+        
+        <tr>
+            <td>#3</td>
+            <td>Grand Theft Auto</td>
+            <td>209</td>
+            <td class="stable">Stable (+0)</td>
+        </tr>
+        
+        <tr>
+            <td>#4</td>
+            <td>Subnautica</td>
+            <td>102</td>
+            <td class="stable">Stable (+0)</td>
+        </tr>
+        
+        <tr>
+            <td>#5</td>
+            <td>Call Of Duty</td>
+            <td>86</td>
+            <td class="stable">Stable (+0)</td>
+        </tr>
+        
+        <tr>
+            <td>#6</td>
+            <td>Rainbow Six Siege</td>
+            <td>49</td>
+            <td class="stable">Stable (+0)</td>
+        </tr>
+        
+        <tr>
+            <td>#7</td>
+            <td>Destiny 2</td>
+            <td>46</td>
+            <td class="down">Declining (-4)</td>
+        </tr>
+        
+        <tr>
+            <td>#8</td>
+            <td>Marvel Rivals</td>
+            <td>44</td>
+            <td class="stable">Stable (+0)</td>
+        </tr>
+        
+        <tr>
+            <td>#9</td>
+            <td>League Of Legends</td>
+            <td>34</td>
+            <td class="stable">Stable (+0)</td>
+        </tr>
+        
+        <tr>
+            <td>#10</td>
+            <td>Among Us</td>
+            <td>33</td>
+            <td class="stable">Stable (+0)</td>
+        </tr>
+        
+    </table>
+    
+    </div>
+
+    <div class="panel">
+        <h2>Steam Trends</h2>
+        <p class="explain">Player demand: what people are actively playing on Steam.</p>
+        
+    <table>
+        <tr>
+            <th>Rank</th>
+            <th>Game</th>
+            <th>Current Steam Players</th>
+        </tr>
+        
+        <tr>
+            <td>#3</td>
+            <td>Counter-Strike 2</td>
+            <td>1,229,556</td>
+        </tr>
+        
+        <tr>
+            <td>#5</td>
+            <td>Dota 2</td>
+            <td>551,522</td>
+        </tr>
+        
+        <tr>
+            <td>#11</td>
+            <td>Pubg</td>
+            <td>347,734</td>
+        </tr>
+        
+        <tr>
+            <td>#13</td>
+            <td>Rust</td>
+            <td>147,843</td>
+        </tr>
+        
+        <tr>
+            <td>#1</td>
+            <td>Apex Legends</td>
+            <td>102,054</td>
+        </tr>
+        
+        <tr>
+            <td>#7</td>
+            <td>Grand Theft Auto</td>
+            <td>76,969</td>
+        </tr>
+        
+        <tr>
+            <td>#9</td>
+            <td>Marvel Rivals</td>
+            <td>76,679</td>
+        </tr>
+        
+        <tr>
+            <td>#14</td>
+            <td>Stardew Valley</td>
+            <td>67,007</td>
+        </tr>
+        
+        <tr>
+            <td>#12</td>
+            <td>Rainbow Six Siege</td>
+            <td>63,898</td>
+        </tr>
+        
+        <tr>
+            <td>#17</td>
+            <td>Warframe</td>
+            <td>54,794</td>
+        </tr>
+        
+    </table>
+    
+    </div>
+</div>
+
+<div class="grid">
+    <div class="panel">
+        <h2>Hot on Both</h2>
+        <p class="explain">Strongest signal because the game appears in both YouTube and Steam trends.</p>
+        <ul><li>Grand Theft Auto</li><li>Marvel Rivals</li><li>Rainbow Six Siege</li></ul>
+    </div>
+
+    <div class="panel">
+        <h2>Steam Popular, YouTube Missed</h2>
+        <p class="explain">Games with strong Steam activity that may not be showing up in YouTube trends.</p>
+        <ul><li>Apex Legends</li><li>Counter-Strike 2</li><li>Dota 2</li><li>Pubg</li><li>Rust</li><li>Stardew Valley</li><li>Warframe</li></ul>
+    </div>
+</div>
+
+<div class="panel">
+    <h2>YouTube Popular, Steam Missing</h2>
+    <p class="explain">
+        These games are showing content attention, but may not have Steam player data.
+        This can happen with console games, mobile games, Roblox, Minecraft, or games not tracked well through Steam.
+    </p>
+    <ul><li>Among Us</li><li>Call Of Duty</li><li>Destiny 2</li><li>League Of Legends</li><li>Minecraft</li><li>Roblox</li><li>Subnautica</li></ul>
+</div>
+
+<div class="panel">
+    <h2>RAWG-Style Game Cards</h2>
+    <p class="explain">
+        These cards make the dashboard easier to understand by showing what the game is, platforms, genres, ratings,
+        YouTube attention, Steam player demand, and trend momentum.
+    </p>
+
+    <div class="card-grid">
+        
         <div class="game-card">
-            
-            <img class="game-image" src="https://media.rawg.io/media/games/b4e/b4e4c73d5aa4ec66bbf75375c4847a2b.jpg" alt="Minecraft">
-            
+            <div class="game-img placeholder">Minecraft</div>
+            <div class="card-body">
+                <h3>Minecraft</h3>
+                <p class="description">A sandbox survival game focused on building, crafting, exploration, and player creativity.</p>
 
-            <div class="game-content">
-                <div class="rank">#1</div>
-
-                <h2>Minecraft</h2>
-
-                <p class="subtitle">
-                    Matched as: <strong>minecraft</strong>
-                </p>
-
-                <div class="stats">
-                    <div>
-                        <span class="stat-value">27</span>
-                        <span class="stat-label">Mentions Today</span>
-                    </div>
-
-                    <div>
-                        <span class="stat-value">11.16%</span>
-                        <span class="stat-label">Of Today's Trending Videos</span>
-                    </div>
-
-                    <div>
-                        <span class="stat-value">+6</span>
-                        <span class="stat-label">Vs Yesterday</span>
-                    </div>
+                <div class="mini-stats">
+                    <div><strong>1,131</strong><span>YouTube</span></div>
+                    <div><strong>N/A</strong><span>Steam</span></div>
+                    <div><strong>-3</strong><span>Change</span></div>
                 </div>
 
-                <p class="meaning">
-                    <strong>Minecraft</strong> appeared in 
-                    <strong>11.16%</strong> of all trending YouTube Gaming videos collected today.
-                </p>
+                <div class="status down">Declining</div>
 
-                <p class="trend trending-up">
-                    Trending Up
-                </p>
-
-                <div class="metadata">
-                    <p><strong>Platforms:</strong> PC, Xbox One, PlayStation 4, Nintendo Switch, iOS, Android, Nintendo 3DS, macOS, Linux, Xbox 360, PlayStation 3, PS Vita, Wii U</p>
-                    <p><strong>Genres:</strong> Action, Arcade, Simulation, Indie, Massively Multiplayer</p>
-                    <p><strong>Released:</strong> 2009-05-10</p>
-                    <p><strong>RAWG Rating:</strong> 4.44</p>
+                <div class="meta">
+                    <p><strong>Platforms:</strong> PC, Xbox, PlayStation, Nintendo Switch, Mobile</p>
+                    <p><strong>Genres:</strong> Sandbox, Survival, Adventure</p>
+                    <p><strong>Released:</strong> 2011-11-18</p>
+                    <p><strong>RAWG Rating:</strong> 4.4</p>
                     <p><strong>Metacritic:</strong> 83</p>
                 </div>
             </div>
         </div>
         
         <div class="game-card">
-            
-            <img class="game-image" src="https://media.rawg.io/media/games/3af/3af386b6e26be6741b711ae6215ef42f.jpg" alt="ROBLOX">
-            
+            <div class="game-img placeholder">Roblox</div>
+            <div class="card-body">
+                <h3>Roblox</h3>
+                <p class="description">A user-generated game platform where players create and play millions of different experiences.</p>
 
-            <div class="game-content">
-                <div class="rank">#2</div>
-
-                <h2>ROBLOX</h2>
-
-                <p class="subtitle">
-                    Matched as: <strong>roblox</strong>
-                </p>
-
-                <div class="stats">
-                    <div>
-                        <span class="stat-value">25</span>
-                        <span class="stat-label">Mentions Today</span>
-                    </div>
-
-                    <div>
-                        <span class="stat-value">10.33%</span>
-                        <span class="stat-label">Of Today's Trending Videos</span>
-                    </div>
-
-                    <div>
-                        <span class="stat-value">-17</span>
-                        <span class="stat-label">Vs Yesterday</span>
-                    </div>
+                <div class="mini-stats">
+                    <div><strong>1,103</strong><span>YouTube</span></div>
+                    <div><strong>N/A</strong><span>Steam</span></div>
+                    <div><strong>-4</strong><span>Change</span></div>
                 </div>
 
-                <p class="meaning">
-                    <strong>ROBLOX</strong> appeared in 
-                    <strong>10.33%</strong> of all trending YouTube Gaming videos collected today.
-                </p>
+                <div class="status down">Declining</div>
 
-                <p class="trend declining">
-                    Declining
-                </p>
-
-                <div class="metadata">
-                    <p><strong>Platforms:</strong> PC, PlayStation 5, PlayStation 4, Xbox One, Xbox Series S/X, iOS, Android, macOS</p>
-                    <p><strong>Genres:</strong> Racing, Shooter, Adventure, Action, RPG, Fighting, Puzzle, Strategy, Arcade, Simulation, Sports, Card, Family, Board Games, Educational, Casual, Indie, Massively Multiplayer, Platformer</p>
+                <div class="meta">
+                    <p><strong>Platforms:</strong> PC, Xbox, PlayStation, Mobile</p>
+                    <p><strong>Genres:</strong> Platform, Sandbox, Creation</p>
                     <p><strong>Released:</strong> 2006-09-01</p>
-                    <p><strong>RAWG Rating:</strong> 3.28</p>
+                    <p><strong>RAWG Rating:</strong> 3.8</p>
                     <p><strong>Metacritic:</strong> N/A</p>
                 </div>
             </div>
         </div>
         
         <div class="game-card">
-            
-            <img class="game-image" src="https://media.rawg.io/media/games/34b/34b1f1850a1c06fd971bc6ab3ac0ce0e.jpg" alt="Destiny 2">
-            
+            <div class="game-img placeholder">Grand Theft Auto</div>
+            <div class="card-body">
+                <h3>Grand Theft Auto</h3>
+                <p class="description">An open-world action crime game known for driving, missions, online play, and sandbox chaos.</p>
 
-            <div class="game-content">
-                <div class="rank">#3</div>
-
-                <h2>Destiny 2</h2>
-
-                <p class="subtitle">
-                    Matched as: <strong>destiny 2</strong>
-                </p>
-
-                <div class="stats">
-                    <div>
-                        <span class="stat-value">22</span>
-                        <span class="stat-label">Mentions Today</span>
-                    </div>
-
-                    <div>
-                        <span class="stat-value">9.09%</span>
-                        <span class="stat-label">Of Today's Trending Videos</span>
-                    </div>
-
-                    <div>
-                        <span class="stat-value">+16</span>
-                        <span class="stat-label">Vs Yesterday</span>
-                    </div>
+                <div class="mini-stats">
+                    <div><strong>209</strong><span>YouTube</span></div>
+                    <div><strong>76,969</strong><span>Steam</span></div>
+                    <div><strong>+0</strong><span>Change</span></div>
                 </div>
 
-                <p class="meaning">
-                    <strong>Destiny 2</strong> appeared in 
-                    <strong>9.09%</strong> of all trending YouTube Gaming videos collected today.
-                </p>
+                <div class="status stable">Stable</div>
 
-                <p class="trend trending-up">
-                    Trending Up
-                </p>
-
-                <div class="metadata">
-                    <p><strong>Platforms:</strong> PC, PlayStation 5, Xbox One, PlayStation 4, Xbox Series S/X, Web</p>
-                    <p><strong>Genres:</strong> Shooter, Action</p>
-                    <p><strong>Released:</strong> 2017-09-06</p>
-                    <p><strong>RAWG Rating:</strong> 3.52</p>
-                    <p><strong>Metacritic:</strong> 82</p>
+                <div class="meta">
+                    <p><strong>Platforms:</strong> PC, Xbox, PlayStation</p>
+                    <p><strong>Genres:</strong> Action, Open World, Crime</p>
+                    <p><strong>Released:</strong> 2013-09-17</p>
+                    <p><strong>RAWG Rating:</strong> 4.5</p>
+                    <p><strong>Metacritic:</strong> 97</p>
                 </div>
             </div>
         </div>
         
         <div class="game-card">
-            
-            <img class="game-image" src="https://media.rawg.io/media/games/9c5/9c5bc0b6e67102bc96dcf1ba41509e42.jpg" alt="Call of Duty">
-            
+            <div class="game-img placeholder">Subnautica</div>
+            <div class="card-body">
+                <h3>Subnautica</h3>
+                <p class="description">An underwater survival adventure game focused on exploration, crafting, and mystery.</p>
 
-            <div class="game-content">
-                <div class="rank">#4</div>
-
-                <h2>Call of Duty</h2>
-
-                <p class="subtitle">
-                    Matched as: <strong>call of duty</strong>
-                </p>
-
-                <div class="stats">
-                    <div>
-                        <span class="stat-value">6</span>
-                        <span class="stat-label">Mentions Today</span>
-                    </div>
-
-                    <div>
-                        <span class="stat-value">2.48%</span>
-                        <span class="stat-label">Of Today's Trending Videos</span>
-                    </div>
-
-                    <div>
-                        <span class="stat-value">-3</span>
-                        <span class="stat-label">Vs Yesterday</span>
-                    </div>
+                <div class="mini-stats">
+                    <div><strong>102</strong><span>YouTube</span></div>
+                    <div><strong>N/A</strong><span>Steam</span></div>
+                    <div><strong>+0</strong><span>Change</span></div>
                 </div>
 
-                <p class="meaning">
-                    <strong>Call of Duty</strong> appeared in 
-                    <strong>2.48%</strong> of all trending YouTube Gaming videos collected today.
-                </p>
+                <div class="status stable">Stable</div>
 
-                <p class="trend declining">
-                    Declining
-                </p>
+                <div class="meta">
+                    <p><strong>Platforms:</strong> PC, Xbox, PlayStation, Switch</p>
+                    <p><strong>Genres:</strong> Survival, Adventure</p>
+                    <p><strong>Released:</strong> 2018-01-23</p>
+                    <p><strong>RAWG Rating:</strong> 4.3</p>
+                    <p><strong>Metacritic:</strong> 87</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="game-card">
+            <div class="game-img placeholder">Call Of Duty</div>
+            <div class="card-body">
+                <h3>Call Of Duty</h3>
+                <p class="description">A military shooter franchise focused on multiplayer, campaigns, Warzone, and competitive action.</p>
 
-                <div class="metadata">
-                    <p><strong>Platforms:</strong> PC, macOS, Xbox 360, PlayStation 3</p>
-                    <p><strong>Genres:</strong> Shooter</p>
+                <div class="mini-stats">
+                    <div><strong>86</strong><span>YouTube</span></div>
+                    <div><strong>N/A</strong><span>Steam</span></div>
+                    <div><strong>+0</strong><span>Change</span></div>
+                </div>
+
+                <div class="status stable">Stable</div>
+
+                <div class="meta">
+                    <p><strong>Platforms:</strong> PC, Xbox, PlayStation</p>
+                    <p><strong>Genres:</strong> Shooter, Action</p>
                     <p><strong>Released:</strong> 2003-10-29</p>
-                    <p><strong>RAWG Rating:</strong> 4.16</p>
-                    <p><strong>Metacritic:</strong> 91</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="game-card">
-            
-            <img class="game-image" src="https://media.rawg.io/media/screenshots/755/7552f856f88b0de1dee040121039b079.jpg" alt="HELLDIVERS 2">
-            
-
-            <div class="game-content">
-                <div class="rank">#5</div>
-
-                <h2>HELLDIVERS 2</h2>
-
-                <p class="subtitle">
-                    Matched as: <strong>helldivers 2</strong>
-                </p>
-
-                <div class="stats">
-                    <div>
-                        <span class="stat-value">6</span>
-                        <span class="stat-label">Mentions Today</span>
-                    </div>
-
-                    <div>
-                        <span class="stat-value">2.48%</span>
-                        <span class="stat-label">Of Today's Trending Videos</span>
-                    </div>
-
-                    <div>
-                        <span class="stat-value">+1</span>
-                        <span class="stat-label">Vs Yesterday</span>
-                    </div>
-                </div>
-
-                <p class="meaning">
-                    <strong>HELLDIVERS 2</strong> appeared in 
-                    <strong>2.48%</strong> of all trending YouTube Gaming videos collected today.
-                </p>
-
-                <p class="trend trending-up">
-                    Trending Up
-                </p>
-
-                <div class="metadata">
-                    <p><strong>Platforms:</strong> PC, PlayStation 5, Xbox Series S/X</p>
-                    <p><strong>Genres:</strong> Action</p>
-                    <p><strong>Released:</strong> 2024-02-08</p>
-                    <p><strong>RAWG Rating:</strong> 4.26</p>
+                    <p><strong>RAWG Rating:</strong> 4.0</p>
                     <p><strong>Metacritic:</strong> N/A</p>
                 </div>
             </div>
         </div>
         
         <div class="game-card">
-            
+            <div class="game-img placeholder">Rainbow Six Siege</div>
+            <div class="card-body">
+                <h3>Rainbow Six Siege</h3>
+                <p class="description">A tactical team-based shooter built around operators, gadgets, destruction, and strategy.</p>
 
-            <div class="game-content">
-                <div class="rank">#6</div>
-
-                <h2>garry s mod</h2>
-
-                <p class="subtitle">
-                    Matched as: <strong>garry s mod</strong>
-                </p>
-
-                <div class="stats">
-                    <div>
-                        <span class="stat-value">4</span>
-                        <span class="stat-label">Mentions Today</span>
-                    </div>
-
-                    <div>
-                        <span class="stat-value">1.65%</span>
-                        <span class="stat-label">Of Today's Trending Videos</span>
-                    </div>
-
-                    <div>
-                        <span class="stat-value">+4</span>
-                        <span class="stat-label">Vs Yesterday</span>
-                    </div>
+                <div class="mini-stats">
+                    <div><strong>49</strong><span>YouTube</span></div>
+                    <div><strong>63,898</strong><span>Steam</span></div>
+                    <div><strong>+0</strong><span>Change</span></div>
                 </div>
 
-                <p class="meaning">
-                    <strong>garry s mod</strong> appeared in 
-                    <strong>1.65%</strong> of all trending YouTube Gaming videos collected today.
-                </p>
+                <div class="status stable">Stable</div>
 
-                <p class="trend trending-up">
-                    Trending Up
-                </p>
-
-                <div class="metadata">
-                    <p><strong>Platforms:</strong> Unknown</p>
-                    <p><strong>Genres:</strong> Unknown</p>
-                    <p><strong>Released:</strong> Unknown</p>
-                    <p><strong>RAWG Rating:</strong> N/A</p>
-                    <p><strong>Metacritic:</strong> N/A</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="game-card">
-            
-            <img class="game-image" src="https://media.rawg.io/media/games/b34/b3419c2706f8f8dbe40d08e23642ad06.jpg" alt="Tom Clancy's Rainbow Six Siege">
-            
-
-            <div class="game-content">
-                <div class="rank">#7</div>
-
-                <h2>Tom Clancy's Rainbow Six Siege</h2>
-
-                <p class="subtitle">
-                    Matched as: <strong>rainbow six siege</strong>
-                </p>
-
-                <div class="stats">
-                    <div>
-                        <span class="stat-value">3</span>
-                        <span class="stat-label">Mentions Today</span>
-                    </div>
-
-                    <div>
-                        <span class="stat-value">1.24%</span>
-                        <span class="stat-label">Of Today's Trending Videos</span>
-                    </div>
-
-                    <div>
-                        <span class="stat-value">-8</span>
-                        <span class="stat-label">Vs Yesterday</span>
-                    </div>
-                </div>
-
-                <p class="meaning">
-                    <strong>Tom Clancy's Rainbow Six Siege</strong> appeared in 
-                    <strong>1.24%</strong> of all trending YouTube Gaming videos collected today.
-                </p>
-
-                <p class="trend declining">
-                    Declining
-                </p>
-
-                <div class="metadata">
-                    <p><strong>Platforms:</strong> PC, PlayStation 5, Xbox One, PlayStation 4, Xbox Series S/X</p>
-                    <p><strong>Genres:</strong> Shooter, Action</p>
+                <div class="meta">
+                    <p><strong>Platforms:</strong> PC, Xbox, PlayStation</p>
+                    <p><strong>Genres:</strong> Shooter, Tactical</p>
                     <p><strong>Released:</strong> 2015-12-01</p>
-                    <p><strong>RAWG Rating:</strong> 3.88</p>
-                    <p><strong>Metacritic:</strong> 75</p>
+                    <p><strong>RAWG Rating:</strong> 3.8</p>
+                    <p><strong>Metacritic:</strong> 73</p>
                 </div>
             </div>
         </div>
         
         <div class="game-card">
-            
+            <div class="game-img placeholder">Destiny 2</div>
+            <div class="card-body">
+                <h3>Destiny 2</h3>
+                <p class="description">Description not loaded yet. Add this game to GAME_META or connect full RAWG API metadata later.</p>
 
-            <div class="game-content">
-                <div class="rank">#8</div>
-
-                <h2>tomodachi life</h2>
-
-                <p class="subtitle">
-                    Matched as: <strong>tomodachi life</strong>
-                </p>
-
-                <div class="stats">
-                    <div>
-                        <span class="stat-value">2</span>
-                        <span class="stat-label">Mentions Today</span>
-                    </div>
-
-                    <div>
-                        <span class="stat-value">0.83%</span>
-                        <span class="stat-label">Of Today's Trending Videos</span>
-                    </div>
-
-                    <div>
-                        <span class="stat-value">+2</span>
-                        <span class="stat-label">Vs Yesterday</span>
-                    </div>
+                <div class="mini-stats">
+                    <div><strong>46</strong><span>YouTube</span></div>
+                    <div><strong>N/A</strong><span>Steam</span></div>
+                    <div><strong>-4</strong><span>Change</span></div>
                 </div>
 
-                <p class="meaning">
-                    <strong>tomodachi life</strong> appeared in 
-                    <strong>0.83%</strong> of all trending YouTube Gaming videos collected today.
-                </p>
+                <div class="status down">Declining</div>
 
-                <p class="trend trending-up">
-                    Trending Up
-                </p>
-
-                <div class="metadata">
-                    <p><strong>Platforms:</strong> Unknown</p>
-                    <p><strong>Genres:</strong> Unknown</p>
-                    <p><strong>Released:</strong> Unknown</p>
+                <div class="meta">
+                    <p><strong>Platforms:</strong> Metadata not loaded yet</p>
+                    <p><strong>Genres:</strong> Metadata not loaded yet</p>
+                    <p><strong>Released:</strong> N/A</p>
                     <p><strong>RAWG Rating:</strong> N/A</p>
                     <p><strong>Metacritic:</strong> N/A</p>
                 </div>
@@ -638,47 +615,23 @@
         </div>
         
         <div class="game-card">
-            
+            <div class="game-img placeholder">Marvel Rivals</div>
+            <div class="card-body">
+                <h3>Marvel Rivals</h3>
+                <p class="description">A superhero team shooter featuring Marvel characters, abilities, team fights, and objective play.</p>
 
-            <div class="game-content">
-                <div class="rank">#9</div>
-
-                <h2>inside</h2>
-
-                <p class="subtitle">
-                    Matched as: <strong>inside</strong>
-                </p>
-
-                <div class="stats">
-                    <div>
-                        <span class="stat-value">2</span>
-                        <span class="stat-label">Mentions Today</span>
-                    </div>
-
-                    <div>
-                        <span class="stat-value">0.83%</span>
-                        <span class="stat-label">Of Today's Trending Videos</span>
-                    </div>
-
-                    <div>
-                        <span class="stat-value">+2</span>
-                        <span class="stat-label">Vs Yesterday</span>
-                    </div>
+                <div class="mini-stats">
+                    <div><strong>44</strong><span>YouTube</span></div>
+                    <div><strong>76,679</strong><span>Steam</span></div>
+                    <div><strong>+0</strong><span>Change</span></div>
                 </div>
 
-                <p class="meaning">
-                    <strong>inside</strong> appeared in 
-                    <strong>0.83%</strong> of all trending YouTube Gaming videos collected today.
-                </p>
+                <div class="status stable">Stable</div>
 
-                <p class="trend trending-up">
-                    Trending Up
-                </p>
-
-                <div class="metadata">
-                    <p><strong>Platforms:</strong> Unknown</p>
-                    <p><strong>Genres:</strong> Unknown</p>
-                    <p><strong>Released:</strong> Unknown</p>
+                <div class="meta">
+                    <p><strong>Platforms:</strong> PC, Xbox, PlayStation</p>
+                    <p><strong>Genres:</strong> Hero Shooter, Action</p>
+                    <p><strong>Released:</strong> 2024-12-06</p>
                     <p><strong>RAWG Rating:</strong> N/A</p>
                     <p><strong>Metacritic:</strong> N/A</p>
                 </div>
@@ -686,107 +639,103 @@
         </div>
         
         <div class="game-card">
-            
+            <div class="game-img placeholder">League Of Legends</div>
+            <div class="card-body">
+                <h3>League Of Legends</h3>
+                <p class="description">A competitive MOBA where two teams battle using champions, lanes, items, and objectives.</p>
 
-            <div class="game-content">
-                <div class="rank">#10</div>
-
-                <h2>subnautica</h2>
-
-                <p class="subtitle">
-                    Matched as: <strong>subnautica</strong>
-                </p>
-
-                <div class="stats">
-                    <div>
-                        <span class="stat-value">2</span>
-                        <span class="stat-label">Mentions Today</span>
-                    </div>
-
-                    <div>
-                        <span class="stat-value">0.83%</span>
-                        <span class="stat-label">Of Today's Trending Videos</span>
-                    </div>
-
-                    <div>
-                        <span class="stat-value">+2</span>
-                        <span class="stat-label">Vs Yesterday</span>
-                    </div>
+                <div class="mini-stats">
+                    <div><strong>34</strong><span>YouTube</span></div>
+                    <div><strong>N/A</strong><span>Steam</span></div>
+                    <div><strong>+0</strong><span>Change</span></div>
                 </div>
 
-                <p class="meaning">
-                    <strong>subnautica</strong> appeared in 
-                    <strong>0.83%</strong> of all trending YouTube Gaming videos collected today.
-                </p>
+                <div class="status stable">Stable</div>
 
-                <p class="trend trending-up">
-                    Trending Up
-                </p>
+                <div class="meta">
+                    <p><strong>Platforms:</strong> PC</p>
+                    <p><strong>Genres:</strong> MOBA, Strategy</p>
+                    <p><strong>Released:</strong> 2009-10-27</p>
+                    <p><strong>RAWG Rating:</strong> 3.6</p>
+                    <p><strong>Metacritic:</strong> 78</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="game-card">
+            <div class="game-img placeholder">Among Us</div>
+            <div class="card-body">
+                <h3>Among Us</h3>
+                <p class="description">A social deduction party game where crewmates find impostors before being eliminated.</p>
 
-                <div class="metadata">
-                    <p><strong>Platforms:</strong> Unknown</p>
-                    <p><strong>Genres:</strong> Unknown</p>
-                    <p><strong>Released:</strong> Unknown</p>
+                <div class="mini-stats">
+                    <div><strong>33</strong><span>YouTube</span></div>
+                    <div><strong>N/A</strong><span>Steam</span></div>
+                    <div><strong>+0</strong><span>Change</span></div>
+                </div>
+
+                <div class="status stable">Stable</div>
+
+                <div class="meta">
+                    <p><strong>Platforms:</strong> PC, Xbox, PlayStation, Switch, Mobile</p>
+                    <p><strong>Genres:</strong> Party, Social Deduction</p>
+                    <p><strong>Released:</strong> 2018-06-15</p>
+                    <p><strong>RAWG Rating:</strong> 3.7</p>
+                    <p><strong>Metacritic:</strong> 85</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="game-card">
+            <div class="game-img placeholder">Counter-Strike 2</div>
+            <div class="card-body">
+                <h3>Counter-Strike 2</h3>
+                <p class="description">Description not loaded yet. Add this game to GAME_META or connect full RAWG API metadata later.</p>
+
+                <div class="mini-stats">
+                    <div><strong>N/A</strong><span>YouTube</span></div>
+                    <div><strong>1,229,556</strong><span>Steam</span></div>
+                    <div><strong>+0</strong><span>Change</span></div>
+                </div>
+
+                <div class="status stable">Stable</div>
+
+                <div class="meta">
+                    <p><strong>Platforms:</strong> Metadata not loaded yet</p>
+                    <p><strong>Genres:</strong> Metadata not loaded yet</p>
+                    <p><strong>Released:</strong> N/A</p>
                     <p><strong>RAWG Rating:</strong> N/A</p>
                     <p><strong>Metacritic:</strong> N/A</p>
                 </div>
             </div>
         </div>
         
-        </section>
+        <div class="game-card">
+            <div class="game-img placeholder">Dota 2</div>
+            <div class="card-body">
+                <h3>Dota 2</h3>
+                <p class="description">A complex competitive MOBA built around heroes, lanes, team fights, and deep strategy.</p>
+
+                <div class="mini-stats">
+                    <div><strong>N/A</strong><span>YouTube</span></div>
+                    <div><strong>551,522</strong><span>Steam</span></div>
+                    <div><strong>+0</strong><span>Change</span></div>
+                </div>
+
+                <div class="status stable">Stable</div>
+
+                <div class="meta">
+                    <p><strong>Platforms:</strong> PC</p>
+                    <p><strong>Genres:</strong> MOBA, Strategy</p>
+                    <p><strong>Released:</strong> 2013-07-09</p>
+                    <p><strong>RAWG Rating:</strong> 3.0</p>
+                    <p><strong>Metacritic:</strong> 90</p>
+                </div>
+            </div>
+        </div>
+        
     </div>
+</div>
 
-    <footer>
-        Project2026 | YouTube Data API + PostgreSQL + RAWG
-    </footer>
-
-    <script>
-        const labels = ["Minecraft", "ROBLOX", "Destiny 2", "Call of Duty", "HELLDIVERS 2", "garry s mod", "Tom Clancy's Rainbow Six Siege", "tomodachi life", "inside", "subnautica"];
-        const values = [27, 25, 22, 6, 6, 4, 3, 2, 2, 2];
-
-        const ctx = document.getElementById('trendChart');
-
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Total Mentions Today',
-                    data: values,
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: '#e5e7eb'
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        ticks: {
-                            color: '#e5e7eb'
-                        },
-                        grid: {
-                            color: '#334155'
-                        }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            color: '#e5e7eb',
-                            precision: 0
-                        },
-                        grid: {
-                            color: '#334155'
-                        }
-                    }
-                }
-            }
-        });
-    </script>
 </body>
 </html>

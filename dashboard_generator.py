@@ -1,539 +1,816 @@
 import os
-import json
-from datetime import datetime
-
+import re
+import pandas as pd
 import psycopg2
+import plotly.express as px
 from dotenv import load_dotenv
 
-
-# =========================
-# LOAD ENV VARIABLES
-# =========================
 load_dotenv()
 
+DB_NAME = os.getenv("DB_NAME", "Gaming_Trend_Tracker")
+DB_USER = os.getenv("DB_USER", "postgres")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_PORT = os.getenv("DB_PORT", "5432")
 
-# =========================
-# CONFIG
-# =========================
-DB_CONFIG = {
-    "host": os.getenv("DB_HOST"),
-    "database": os.getenv("DB_NAME"),
-    "user": os.getenv("DB_USER"),
-    "password": os.getenv("DB_PASSWORD")
+
+GAME_META = {
+    "minecraft": {
+        "platforms": "PC, Xbox, PlayStation, Nintendo Switch, Mobile",
+        "genres": "Sandbox, Survival, Adventure",
+        "released": "2011-11-18",
+        "rating": "4.4",
+        "metacritic": "83",
+        "description": "A sandbox survival game focused on building, crafting, exploration, and player creativity."
+    },
+    "roblox": {
+        "platforms": "PC, Xbox, PlayStation, Mobile",
+        "genres": "Platform, Sandbox, Creation",
+        "released": "2006-09-01",
+        "rating": "3.8",
+        "metacritic": "N/A",
+        "description": "A user-generated game platform where players create and play millions of different experiences."
+    },
+    "grand theft auto": {
+        "platforms": "PC, Xbox, PlayStation",
+        "genres": "Action, Open World, Crime",
+        "released": "2013-09-17",
+        "rating": "4.5",
+        "metacritic": "97",
+        "description": "An open-world action crime game known for driving, missions, online play, and sandbox chaos."
+    },
+    "subnautica": {
+        "platforms": "PC, Xbox, PlayStation, Switch",
+        "genres": "Survival, Adventure",
+        "released": "2018-01-23",
+        "rating": "4.3",
+        "metacritic": "87",
+        "description": "An underwater survival adventure game focused on exploration, crafting, and mystery."
+    },
+    "call of duty": {
+        "platforms": "PC, Xbox, PlayStation",
+        "genres": "Shooter, Action",
+        "released": "2003-10-29",
+        "rating": "4.0",
+        "metacritic": "N/A",
+        "description": "A military shooter franchise focused on multiplayer, campaigns, Warzone, and competitive action."
+    },
+    "rainbow six siege": {
+        "platforms": "PC, Xbox, PlayStation",
+        "genres": "Shooter, Tactical",
+        "released": "2015-12-01",
+        "rating": "3.8",
+        "metacritic": "73",
+        "description": "A tactical team-based shooter built around operators, gadgets, destruction, and strategy."
+    },
+    "marvel rivals": {
+        "platforms": "PC, Xbox, PlayStation",
+        "genres": "Hero Shooter, Action",
+        "released": "2024-12-06",
+        "rating": "N/A",
+        "metacritic": "N/A",
+        "description": "A superhero team shooter featuring Marvel characters, abilities, team fights, and objective play."
+    },
+    "league of legends": {
+        "platforms": "PC",
+        "genres": "MOBA, Strategy",
+        "released": "2009-10-27",
+        "rating": "3.6",
+        "metacritic": "78",
+        "description": "A competitive MOBA where two teams battle using champions, lanes, items, and objectives."
+    },
+    "among us": {
+        "platforms": "PC, Xbox, PlayStation, Switch, Mobile",
+        "genres": "Party, Social Deduction",
+        "released": "2018-06-15",
+        "rating": "3.7",
+        "metacritic": "85",
+        "description": "A social deduction party game where crewmates find impostors before being eliminated."
+    },
+    "counter strike 2": {
+        "platforms": "PC",
+        "genres": "Shooter, Competitive",
+        "released": "2023-09-27",
+        "rating": "N/A",
+        "metacritic": "N/A",
+        "description": "A competitive tactical FPS focused on precision shooting, economy, teamwork, and ranked matches."
+    },
+    "dota 2": {
+        "platforms": "PC",
+        "genres": "MOBA, Strategy",
+        "released": "2013-07-09",
+        "rating": "3.0",
+        "metacritic": "90",
+        "description": "A complex competitive MOBA built around heroes, lanes, team fights, and deep strategy."
+    },
+    "rust": {
+        "platforms": "PC, Xbox, PlayStation",
+        "genres": "Survival, Multiplayer",
+        "released": "2018-02-08",
+        "rating": "3.7",
+        "metacritic": "69",
+        "description": "A multiplayer survival game focused on gathering, base building, raids, crafting, and PvP."
+    },
+    "apex legends": {
+        "platforms": "PC, Xbox, PlayStation, Switch",
+        "genres": "Battle Royale, Shooter",
+        "released": "2019-02-04",
+        "rating": "3.7",
+        "metacritic": "89",
+        "description": "A fast battle royale hero shooter with squads, legends, abilities, and movement-heavy combat."
+    },
+    "stardew valley": {
+        "platforms": "PC, Xbox, PlayStation, Switch, Mobile",
+        "genres": "Farming, RPG, Simulation",
+        "released": "2016-02-26",
+        "rating": "4.4",
+        "metacritic": "89",
+        "description": "A farming life sim with crops, mining, fishing, relationships, crafting, and town progression."
+    },
+    "warframe": {
+        "platforms": "PC, Xbox, PlayStation, Switch",
+        "genres": "Action, Shooter, MMO",
+        "released": "2013-03-25",
+        "rating": "3.7",
+        "metacritic": "69",
+        "description": "A free-to-play sci-fi action game focused on fast combat, loot, missions, and character builds."
+    },
+    "pubg": {
+        "platforms": "PC, Xbox, PlayStation, Mobile",
+        "genres": "Battle Royale, Shooter",
+        "released": "2017-12-20",
+        "rating": "3.3",
+        "metacritic": "86",
+        "description": "A battle royale shooter where players loot, survive, and fight to be the last one standing."
+    }
 }
 
-if not DB_CONFIG["password"]:
-    raise ValueError("Missing DB_PASSWORD in .env file")
+
+def get_connection():
+    return psycopg2.connect(
+        dbname=DB_NAME,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        host=DB_HOST,
+        port=DB_PORT
+    )
 
 
-# =========================
-# FETCH DASHBOARD DATA
-# =========================
-def fetch_dashboard_data():
-    conn = psycopg2.connect(**DB_CONFIG)
-    cursor = conn.cursor()
+def slugify(name):
+    return re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
 
-    cursor.execute("""
-        WITH current_runs AS (
-            SELECT
-                run_time,
-                MAX(total_videos) AS videos_in_pull
+
+def image_for_game(game_name):
+    slug = slugify(game_name)
+
+    possible = [
+        f"Images/{slug}.jpg",
+        f"Images/{slug}.png",
+        f"images/{slug}.jpg",
+        f"images/{slug}.png"
+    ]
+
+    for path in possible:
+        if os.path.exists(path):
+            return path.replace("\\", "/")
+
+    return ""
+
+
+def fmt_num(value):
+    try:
+        if value is None or pd.isna(value):
+            return "N/A"
+        return f"{int(value):,}"
+    except Exception:
+        return "N/A"
+
+
+def get_youtube_trends(conn, days=7, limit=10):
+    query = """
+        SELECT
+            LOWER(game_name) AS game_name,
+            SUM(mentions) AS youtube_mentions
+        FROM trending_games
+        WHERE run_timestamp >= NOW() - INTERVAL %s
+        GROUP BY LOWER(game_name)
+        ORDER BY youtube_mentions DESC
+        LIMIT %s;
+    """
+    return pd.read_sql(query, conn, params=(f"{days} days", limit))
+
+
+def get_steam_trends(conn, limit=10):
+    query = """
+        SELECT DISTINCT ON (LOWER(game_name))
+            LOWER(game_name) AS game_name,
+            current_players
+        FROM steam_trends
+        ORDER BY LOWER(game_name), captured_at DESC;
+    """
+
+    try:
+        df = pd.read_sql(query, conn)
+        return df.sort_values("current_players", ascending=False).head(limit)
+    except Exception:
+        return pd.DataFrame(columns=["game_name", "current_players"])
+
+
+def get_latest_change(conn):
+    query = """
+        WITH latest_runs AS (
+            SELECT DISTINCT run_timestamp
             FROM trending_games
-            WHERE DATE(run_time) = CURRENT_DATE
-            GROUP BY run_time
+            ORDER BY run_timestamp DESC
+            LIMIT 2
         ),
-        current_total AS (
+        ranked_runs AS (
             SELECT
-                COALESCE(SUM(videos_in_pull), 0) AS total_videos_today,
-                COUNT(*) AS pulls_today
-            FROM current_runs
+                run_timestamp,
+                ROW_NUMBER() OVER (ORDER BY run_timestamp DESC) AS run_rank
+            FROM latest_runs
         ),
-        current_games AS (
-            SELECT
-                game_name,
-                SUM(mentions) AS mentions_today,
-                MAX(rawg_name) AS rawg_name,
-                MAX(released) AS released,
-                MAX(rating) AS rating,
-                MAX(metacritic) AS metacritic,
-                MAX(platforms) AS platforms,
-                MAX(genres) AS genres,
-                MAX(background_image) AS background_image
-            FROM trending_games
-            WHERE DATE(run_time) = CURRENT_DATE
-            GROUP BY game_name
+        current_run AS (
+            SELECT LOWER(game_name) AS game_name, SUM(mentions) AS mentions
+            FROM trending_games t
+            JOIN ranked_runs r ON t.run_timestamp = r.run_timestamp
+            WHERE r.run_rank = 1
+            GROUP BY LOWER(game_name)
         ),
-        previous_games AS (
-            SELECT
-                game_name,
-                SUM(mentions) AS mentions_yesterday
-            FROM trending_games
-            WHERE DATE(run_time) = CURRENT_DATE - INTERVAL '1 day'
-            GROUP BY game_name
+        previous_run AS (
+            SELECT LOWER(game_name) AS game_name, SUM(mentions) AS mentions
+            FROM trending_games t
+            JOIN ranked_runs r ON t.run_timestamp = r.run_timestamp
+            WHERE r.run_rank = 2
+            GROUP BY LOWER(game_name)
         )
         SELECT
-            current_games.game_name,
-            current_games.mentions_today,
-            current_total.total_videos_today,
-            ROUND(
-                (current_games.mentions_today::numeric / NULLIF(current_total.total_videos_today, 0)) * 100,
-                2
-            ) AS percentage_today,
-            COALESCE(previous_games.mentions_yesterday, 0) AS mentions_yesterday,
-            current_games.mentions_today - COALESCE(previous_games.mentions_yesterday, 0) AS change,
-            current_games.rawg_name,
-            current_games.released,
-            current_games.rating,
-            current_games.metacritic,
-            current_games.platforms,
-            current_games.genres,
-            current_games.background_image,
-            current_total.pulls_today
-        FROM current_games
-        CROSS JOIN current_total
-        LEFT JOIN previous_games
-            ON current_games.game_name = previous_games.game_name
-        ORDER BY current_games.mentions_today DESC
-        LIMIT 10;
-    """)
+            c.game_name,
+            c.mentions - COALESCE(p.mentions, 0) AS change
+        FROM current_run c
+        LEFT JOIN previous_run p ON c.game_name = p.game_name;
+    """
 
-    rows = cursor.fetchall()
+    try:
+        return pd.read_sql(query, conn)
+    except Exception:
+        return pd.DataFrame(columns=["game_name", "change"])
 
-    cursor.close()
-    conn.close()
 
-    dashboard_data = []
+def trend_label(change):
+    if change > 0:
+        return "Trending Up", "up"
+    if change < 0:
+        return "Declining", "down"
+    return "Stable", "stable"
 
-    for row in rows:
-        (
-            game_name,
-            mentions_today,
-            total_videos_today,
-            percentage_today,
-            mentions_yesterday,
-            change,
-            rawg_name,
-            released,
-            rating,
-            metacritic,
-            platforms,
-            genres,
-            background_image,
-            pulls_today
-        ) = row
 
-        if change > 0:
-            trend_label = "Trending Up"
-        elif change < 0:
-            trend_label = "Declining"
-        else:
-            trend_label = "Stable"
+def compare_trends(youtube_df, steam_df):
+    y_games = set(youtube_df["game_name"]) if not youtube_df.empty else set()
+    s_games = set(steam_df["game_name"]) if not steam_df.empty else set()
 
-        dashboard_data.append({
-            "game_name": game_name,
-            "display_name": rawg_name or game_name,
-            "mentions": mentions_today,
-            "total_videos": total_videos_today,
-            "percentage": percentage_today,
-            "mentions_yesterday": mentions_yesterday,
-            "change": change,
-            "trend_label": trend_label,
-            "released": str(released) if released else "Unknown",
-            "rating": rating if rating is not None else "N/A",
-            "metacritic": metacritic if metacritic is not None else "N/A",
-            "platforms": platforms or "Unknown",
-            "genres": genres or "Unknown",
-            "background_image": background_image or "",
-            "pulls_today": pulls_today
+    both = sorted(y_games.intersection(s_games))
+    youtube_only = sorted(y_games - s_games)
+    steam_only = sorted(s_games - y_games)
+
+    return both, youtube_only, steam_only
+
+
+def make_chart(df, x_col, y_col, title):
+    if df.empty:
+        return "<p>No chart data yet.</p>"
+
+    fig = px.bar(
+        df,
+        x=x_col,
+        y=y_col,
+        text=y_col,
+        title=title
+    )
+
+    fig.update_layout(
+        height=340,
+        template="plotly_dark",
+        paper_bgcolor="#111827",
+        plot_bgcolor="#111827",
+        margin=dict(l=30, r=30, t=55, b=40)
+    )
+
+    return fig.to_html(full_html=False, include_plotlyjs="cdn")
+
+
+def youtube_table(df, change_map):
+    if df.empty:
+        return "<p>No YouTube data yet.</p>"
+
+    rows = ""
+
+    for i, row in df.iterrows():
+        game = row["game_name"]
+        change = change_map.get(game, 0)
+        status, status_class = trend_label(change)
+
+        rows += f"""
+        <tr>
+            <td>#{i + 1}</td>
+            <td>{game.title()}</td>
+            <td>{fmt_num(row["youtube_mentions"])}</td>
+            <td class="{status_class}">{status} ({change:+})</td>
+        </tr>
+        """
+
+    return f"""
+    <table>
+        <tr>
+            <th>Rank</th>
+            <th>Game</th>
+            <th>YouTube Mentions</th>
+            <th>Momentum</th>
+        </tr>
+        {rows}
+    </table>
+    """
+
+
+def steam_table(df):
+    if df.empty:
+        return "<p>No Steam data yet.</p>"
+
+    rows = ""
+
+    for i, row in df.iterrows():
+        rows += f"""
+        <tr>
+            <td>#{i + 1}</td>
+            <td>{row["game_name"].title()}</td>
+            <td>{fmt_num(row["current_players"])}</td>
+        </tr>
+        """
+
+    return f"""
+    <table>
+        <tr>
+            <th>Rank</th>
+            <th>Game</th>
+            <th>Current Steam Players</th>
+        </tr>
+        {rows}
+    </table>
+    """
+
+
+def simple_list(items):
+    if not items:
+        return "<p>None found yet.</p>"
+
+    return "<ul>" + "".join(f"<li>{x.title()}</li>" for x in items) + "</ul>"
+
+
+def build_game_cards(youtube_df, steam_df, change_map):
+    combined_games = []
+
+    for game in youtube_df["game_name"].tolist():
+        if game not in combined_games:
+            combined_games.append(game)
+
+    for game in steam_df["game_name"].tolist():
+        if game not in combined_games:
+            combined_games.append(game)
+
+    steam_map = {
+        row["game_name"]: row["current_players"]
+        for _, row in steam_df.iterrows()
+    }
+
+    youtube_map = {
+        row["game_name"]: row["youtube_mentions"]
+        for _, row in youtube_df.iterrows()
+    }
+
+    cards = ""
+
+    for game in combined_games[:12]:
+        game_title = game.title()
+        meta = GAME_META.get(game, {
+            "platforms": "Metadata not loaded yet",
+            "genres": "Metadata not loaded yet",
+            "released": "N/A",
+            "rating": "N/A",
+            "metacritic": "N/A",
+            "description": "Description not loaded yet. Add this game to GAME_META or connect full RAWG API metadata later."
         })
 
-    return dashboard_data
+        change = change_map.get(game, 0)
+        status, status_class = trend_label(change)
+        img = image_for_game(game)
 
+        if img:
+            image_html = f'<img src="{img}" class="game-img">'
+        else:
+            image_html = f'<div class="game-img placeholder">{game_title}</div>'
 
-# =========================
-# GENERATE HTML
-# =========================
-def generate_dashboard():
-    data = fetch_dashboard_data()
-
-    chart_labels = [item["display_name"] for item in data]
-    chart_values = [item["mentions"] for item in data]
-
-    pulls_today = data[0]["pulls_today"] if data else 0
-    total_videos_today = data[0]["total_videos"] if data else 0
-
-    cards_html = ""
-
-    for rank, item in enumerate(data, start=1):
-        image_html = ""
-
-        if item["background_image"]:
-            image_html = f"""
-            <img class="game-image" src="{item["background_image"]}" alt="{item["display_name"]}">
-            """
-
-        change_display = f"+{item['change']}" if item["change"] > 0 else item["change"]
-
-        cards_html += f"""
+        cards += f"""
         <div class="game-card">
             {image_html}
+            <div class="card-body">
+                <h3>{game_title}</h3>
+                <p class="description">{meta["description"]}</p>
 
-            <div class="game-content">
-                <div class="rank">#{rank}</div>
-
-                <h2>{item["display_name"]}</h2>
-
-                <p class="subtitle">
-                    Matched as: <strong>{item["game_name"]}</strong>
-                </p>
-
-                <div class="stats">
-                    <div>
-                        <span class="stat-value">{item["mentions"]}</span>
-                        <span class="stat-label">Mentions Today</span>
-                    </div>
-
-                    <div>
-                        <span class="stat-value">{item["percentage"]}%</span>
-                        <span class="stat-label">Of Today's Trending Videos</span>
-                    </div>
-
-                    <div>
-                        <span class="stat-value">{change_display}</span>
-                        <span class="stat-label">Vs Yesterday</span>
-                    </div>
+                <div class="mini-stats">
+                    <div><strong>{fmt_num(youtube_map.get(game))}</strong><span>YouTube</span></div>
+                    <div><strong>{fmt_num(steam_map.get(game))}</strong><span>Steam</span></div>
+                    <div><strong>{change:+}</strong><span>Change</span></div>
                 </div>
 
-                <p class="meaning">
-                    <strong>{item["display_name"]}</strong> appeared in 
-                    <strong>{item["percentage"]}%</strong> of all trending YouTube Gaming videos collected today.
-                </p>
+                <div class="status {status_class}">{status}</div>
 
-                <p class="trend {item["trend_label"].replace(" ", "-").lower()}">
-                    {item["trend_label"]}
-                </p>
-
-                <div class="metadata">
-                    <p><strong>Platforms:</strong> {item["platforms"]}</p>
-                    <p><strong>Genres:</strong> {item["genres"]}</p>
-                    <p><strong>Released:</strong> {item["released"]}</p>
-                    <p><strong>RAWG Rating:</strong> {item["rating"]}</p>
-                    <p><strong>Metacritic:</strong> {item["metacritic"]}</p>
+                <div class="meta">
+                    <p><strong>Platforms:</strong> {meta["platforms"]}</p>
+                    <p><strong>Genres:</strong> {meta["genres"]}</p>
+                    <p><strong>Released:</strong> {meta["released"]}</p>
+                    <p><strong>RAWG Rating:</strong> {meta["rating"]}</p>
+                    <p><strong>Metacritic:</strong> {meta["metacritic"]}</p>
                 </div>
             </div>
         </div>
         """
 
+    return cards
+
+
+def build_summary(youtube_df, steam_df, both, steam_only):
+    top_youtube = youtube_df.iloc[0]["game_name"].title() if not youtube_df.empty else "N/A"
+    top_steam = steam_df.iloc[0]["game_name"].title() if not steam_df.empty else "N/A"
+
+    summary = f"""
+    <p>
+        <strong>{top_youtube}</strong> is leading YouTube attention, while
+        <strong>{top_steam}</strong> is leading Steam player demand.
+    </p>
+    <p>
+        Games appearing on both lists are stronger trend signals because they have both content attention and active players.
+        Steam-only games matter too because they may be popular with players even if YouTube is not talking about them much.
+    </p>
+    """
+
+    if both:
+        summary += f"<p><strong>Hot on both:</strong> {', '.join(x.title() for x in both[:5])}</p>"
+
+    if steam_only:
+        summary += f"<p><strong>Steam breakout signal:</strong> {', '.join(x.title() for x in steam_only[:5])}</p>"
+
+    return summary
+
+
+def build_dashboard(days=7):
+    conn = get_connection()
+
+    youtube_df = get_youtube_trends(conn, days, 10)
+    steam_df = get_steam_trends(conn, 10)
+    changes_df = get_latest_change(conn)
+
+    conn.close()
+
+    change_map = {
+        row["game_name"]: int(row["change"])
+        for _, row in changes_df.iterrows()
+    }
+
+    both, youtube_only, steam_only = compare_trends(youtube_df, steam_df)
+
+    view_name = "Today" if days == 1 else f"Last {days} Days"
+
+    youtube_chart = make_chart(
+        youtube_df,
+        "game_name",
+        "youtube_mentions",
+        f"YouTube Mentions - {view_name}"
+    )
+
+    steam_chart = make_chart(
+        steam_df,
+        "game_name",
+        "current_players",
+        "Steam Current Players"
+    )
+
+    cards = build_game_cards(youtube_df, steam_df, change_map)
+    summary = build_summary(youtube_df, steam_df, both, steam_only)
+
     html = f"""
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Project2026 Gaming Trend Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<title>Project2026 Gaming Trend Tracker</title>
+<style>
+body {{
+    background:
+        radial-gradient(circle at top left, rgba(56,189,248,.16), transparent 30%),
+        radial-gradient(circle at top right, rgba(99,102,241,.14), transparent 28%),
+        linear-gradient(135deg, #020617, #0f172a 50%, #111827);
+    color: #e5e7eb;
+    font-family: Arial, sans-serif;
+    padding: 24px;
+    margin: 0;
+}}
 
-    <style>
-        body {{
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #0f172a;
-            color: #e5e7eb;
-        }}
+h1 {{
+    color: #38bdf8;
+    margin-bottom: 4px;
+}}
 
-        header {{
-            padding: 32px;
-            text-align: center;
-            background: #111827;
-            border-bottom: 1px solid #334155;
-        }}
+.subtitle {{
+    color: #94a3b8;
+    margin-bottom: 16px;
+}}
 
-        header h1 {{
-            margin: 0;
-            font-size: 36px;
-        }}
+.buttons a {{
+    display: inline-block;
+    background: #1e293b;
+    color: white;
+    padding: 10px 16px;
+    margin-right: 8px;
+    border-radius: 8px;
+    text-decoration: none;
+    border: 1px solid #334155;
+}}
 
-        header p {{
-            color: #94a3b8;
-            margin-top: 8px;
-        }}
+.panel,
+.game-card {{
+    background: rgba(15,23,42,.94);
+    border: 1px solid #334155;
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0,0,0,.28);
+}}
 
-        .container {{
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 32px;
-        }}
+.panel {{
+    padding: 18px;
+    margin-top: 18px;
+}}
 
-        .summary-box {{
-            background: #111827;
-            border: 1px solid #334155;
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 32px;
-            color: #cbd5e1;
-            line-height: 1.6;
-        }}
+.grid {{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+}}
 
-        .summary-grid {{
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-            margin-top: 18px;
-        }}
+.card-grid {{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-top: 18px;
+}}
 
-        .summary-stat {{
-            background: #020617;
-            border: 1px solid #1e293b;
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-        }}
+.explain {{
+    color: #cbd5e1;
+    line-height: 1.5;
+}}
 
-        .summary-stat span {{
-            display: block;
-            font-size: 28px;
-            font-weight: bold;
-            color: #38bdf8;
-        }}
+.summary-text {{
+    color: #dbeafe;
+    line-height: 1.6;
+    background: rgba(2,6,23,.45);
+    border-left: 4px solid #38bdf8;
+    padding: 14px;
+    border-radius: 10px;
+}}
 
-        .summary-stat small {{
-            color: #94a3b8;
-        }}
+table {{
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+}}
 
-        .chart-section {{
-            background: #111827;
-            padding: 24px;
-            border-radius: 16px;
-            margin-bottom: 32px;
-            border: 1px solid #334155;
-        }}
+th,
+td {{
+    border-bottom: 1px solid #334155;
+    padding: 10px;
+    text-align: left;
+}}
 
-        .grid {{
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
-            gap: 24px;
-        }}
+th {{
+    color: #38bdf8;
+}}
 
-        .game-card {{
-            background: #111827;
-            border: 1px solid #334155;
-            border-radius: 18px;
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-        }}
+.up {{
+    color: #4ade80;
+}}
 
-        .game-image {{
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-            display: block;
-        }}
+.down {{
+    color: #f87171;
+}}
 
-        .game-content {{
-            padding: 20px;
-        }}
+.stable {{
+    color: #facc15;
+}}
 
-        .rank {{
-            color: #38bdf8;
-            font-weight: bold;
-            font-size: 18px;
-        }}
+.game-card {{
+    overflow: hidden;
+}}
 
-        h2 {{
-            margin: 8px 0;
-            font-size: 24px;
-        }}
+.game-img {{
+    width: 100%;
+    height: 145px;
+    object-fit: cover;
+    display: block;
+}}
 
-        .subtitle {{
-            color: #94a3b8;
-            font-size: 14px;
-        }}
+.placeholder {{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1e3a8a, #020617);
+    color: #93c5fd;
+    font-size: 22px;
+    font-weight: bold;
+}}
 
-        .stats {{
-            display: flex;
-            justify-content: space-between;
-            margin: 20px 0;
-            gap: 12px;
-        }}
+.card-body {{
+    padding: 16px;
+}}
 
-        .stats div {{
-            background: #1e293b;
-            padding: 12px;
-            border-radius: 12px;
-            text-align: center;
-            flex: 1;
-        }}
+.card-body h3 {{
+    margin: 0 0 8px 0;
+    font-size: 22px;
+}}
 
-        .stat-value {{
-            display: block;
-            font-size: 22px;
-            font-weight: bold;
-        }}
+.description {{
+    color: #cbd5e1;
+    font-size: 13px;
+    line-height: 1.45;
+    min-height: 58px;
+}}
 
-        .stat-label {{
-            display: block;
-            color: #94a3b8;
-            font-size: 12px;
-            margin-top: 4px;
-        }}
+.mini-stats {{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: 14px 0;
+}}
 
-        .meaning {{
-            background: #020617;
-            border: 1px solid #1e293b;
-            padding: 12px;
-            border-radius: 12px;
-            color: #cbd5e1;
-            font-size: 14px;
-            line-height: 1.5;
-        }}
+.mini-stats div {{
+    background: #020617;
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+}}
 
-        .trend {{
-            display: inline-block;
-            padding: 8px 12px;
-            border-radius: 999px;
-            font-weight: bold;
-            font-size: 13px;
-            margin-top: 10px;
-        }}
+.mini-stats strong {{
+    display: block;
+    color: white;
+    font-size: 15px;
+}}
 
-        .trending-up {{
-            background: #064e3b;
-            color: #6ee7b7;
-        }}
+.mini-stats span {{
+    font-size: 10px;
+    color: #94a3b8;
+}}
 
-        .declining {{
-            background: #7f1d1d;
-            color: #fecaca;
-        }}
+.status {{
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    background: #020617;
+    border: 1px solid #334155;
+}}
 
-        .stable {{
-            background: #334155;
-            color: #cbd5e1;
-        }}
+.meta p {{
+    color: #cbd5e1;
+    font-size: 12px;
+    margin: 6px 0;
+}}
 
-        .metadata {{
-            margin-top: 18px;
-            font-size: 14px;
-            color: #cbd5e1;
-            line-height: 1.5;
-        }}
+.meta strong {{
+    color: #38bdf8;
+}}
 
-        .metadata p {{
-            margin: 8px 0;
-        }}
+li {{
+    margin: 7px 0;
+}}
 
-        footer {{
-            text-align: center;
-            color: #64748b;
-            padding: 24px;
-            font-size: 13px;
-        }}
-    </style>
+@media (max-width: 1000px) {{
+    .grid,
+    .card-grid {{
+        grid-template-columns: 1fr;
+    }}
+}}
+</style>
 </head>
 
 <body>
-    <header>
-        <h1>Project2026 Gaming Trend Dashboard</h1>
-        <p>Daily gaming trend summary from YouTube Gaming, enriched with RAWG metadata</p>
-        <p>Last updated: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}</p>
-    </header>
 
-    <div class="container">
-        <section class="summary-box">
-            <strong>How to read this dashboard:</strong>
-            This dashboard shows what percentage of today's collected trending YouTube Gaming videos each game appeared in.
-            For example, if a game shows 24%, that means it appeared in 24% of the trending videos collected today.
+<h1>Project2026 Gaming Trend Tracker</h1>
+<p class="subtitle">Tracking gaming trends across YouTube, Steam, RAWG-style metadata, and future sources.</p>
 
-            <div class="summary-grid">
-                <div class="summary-stat">
-                    <span>{pulls_today}</span>
-                    <small>Pulls Today</small>
-                </div>
+<div class="buttons">
+    <a href="dashboard_today.html">Today</a>
+    <a href="dashboard_week.html">7 Days</a>
+    <a href="dashboard_month.html">30 Days</a>
+</div>
 
-                <div class="summary-stat">
-                    <span>{total_videos_today}</span>
-                    <small>Total Trending Videos Checked Today</small>
-                </div>
+<div class="panel">
+    <h2>Current View: {view_name}</h2>
+    <p class="explain">
+        YouTube shows content attention. Steam shows active player demand.
+        RAWG-style cards explain what each game is, what platforms it is on, and why it matters.
+    </p>
+</div>
 
-                <div class="summary-stat">
-                    <span>{len(data)}</span>
-                    <small>Top Games Displayed</small>
-                </div>
-            </div>
-        </section>
+<div class="panel">
+    <h2>Trend Summary</h2>
+    <div class="summary-text">
+        {summary}
+    </div>
+</div>
 
-        <section class="chart-section">
-            <canvas id="trendChart"></canvas>
-        </section>
-
-        <section class="grid">
-            {cards_html}
-        </section>
+<div class="grid">
+    <div class="panel">
+        <h2>YouTube Trend Graph</h2>
+        {youtube_chart}
     </div>
 
-    <footer>
-        Project2026 | YouTube Data API + PostgreSQL + RAWG
-    </footer>
+    <div class="panel">
+        <h2>Steam Player Graph</h2>
+        {steam_chart}
+    </div>
+</div>
 
-    <script>
-        const labels = {json.dumps(chart_labels)};
-        const values = {json.dumps(chart_values)};
+<div class="grid">
+    <div class="panel">
+        <h2>YouTube Trends</h2>
+        <p class="explain">Content attention: what people are watching and talking about.</p>
+        {youtube_table(youtube_df, change_map)}
+    </div>
 
-        const ctx = document.getElementById('trendChart');
+    <div class="panel">
+        <h2>Steam Trends</h2>
+        <p class="explain">Player demand: what people are actively playing on Steam.</p>
+        {steam_table(steam_df)}
+    </div>
+</div>
 
-        new Chart(ctx, {{
-            type: 'bar',
-            data: {{
-                labels: labels,
-                datasets: [{{
-                    label: 'Total Mentions Today',
-                    data: values,
-                    borderWidth: 1
-                }}]
-            }},
-            options: {{
-                responsive: true,
-                plugins: {{
-                    legend: {{
-                        labels: {{
-                            color: '#e5e7eb'
-                        }}
-                    }}
-                }},
-                scales: {{
-                    x: {{
-                        ticks: {{
-                            color: '#e5e7eb'
-                        }},
-                        grid: {{
-                            color: '#334155'
-                        }}
-                    }},
-                    y: {{
-                        beginAtZero: true,
-                        ticks: {{
-                            color: '#e5e7eb',
-                            precision: 0
-                        }},
-                        grid: {{
-                            color: '#334155'
-                        }}
-                    }}
-                }}
-            }}
-        }});
-    </script>
+<div class="grid">
+    <div class="panel">
+        <h2>Hot on Both</h2>
+        <p class="explain">Strongest signal because the game appears in both YouTube and Steam trends.</p>
+        {simple_list(both)}
+    </div>
+
+    <div class="panel">
+        <h2>Steam Popular, YouTube Missed</h2>
+        <p class="explain">Games with strong Steam activity that may not be showing up in YouTube trends.</p>
+        {simple_list(steam_only)}
+    </div>
+</div>
+
+<div class="panel">
+    <h2>YouTube Popular, Steam Missing</h2>
+    <p class="explain">
+        These games are showing content attention, but may not have Steam player data.
+        This can happen with console games, mobile games, Roblox, Minecraft, or games not tracked well through Steam.
+    </p>
+    {simple_list(youtube_only)}
+</div>
+
+<div class="panel">
+    <h2>RAWG-Style Game Cards</h2>
+    <p class="explain">
+        These cards make the dashboard easier to understand by showing what the game is, platforms, genres, ratings,
+        YouTube attention, Steam player demand, and trend momentum.
+    </p>
+
+    <div class="card-grid">
+        {cards}
+    </div>
+</div>
+
 </body>
 </html>
 """
 
-    with open("index.html", "w", encoding="utf-8") as file:
-        file.write(html)
+    filename = {
+        1: "dashboard_today.html",
+        7: "dashboard_week.html",
+        30: "dashboard_month.html"
+    }.get(days, "index.html")
 
-    print("Daily dashboard updated successfully: index.html")
+    with open(filename, "w", encoding="utf-8") as f:
+        f.write(html)
+
+    if days == 7:
+        with open("index.html", "w", encoding="utf-8") as f:
+            f.write(html)
+
+    print(f"Created {filename}")
 
 
-# =========================
-# MAIN
-# =========================
 if __name__ == "__main__":
-    generate_dashboard()
+    build_dashboard(1)
+    build_dashboard(7)
+    build_dashboard(30)
+
+    print("Gaming Trend Tracker dashboard updated with graphs, trend status, and RAWG-style cards.")

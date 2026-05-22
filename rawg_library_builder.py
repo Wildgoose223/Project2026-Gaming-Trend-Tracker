@@ -7,7 +7,7 @@ load_dotenv()
 
 RAWG_API_KEY = os.getenv("RAWG_API_KEY")
 
-DB_NAME = os.getenv("DB_NAME", "YouTube_Data")
+DB_NAME = os.getenv("DB_NAME", "Gaming_Trend_Tracker")
 DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_HOST = os.getenv("DB_HOST", "localhost")
