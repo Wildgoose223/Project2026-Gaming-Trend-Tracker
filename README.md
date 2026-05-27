@@ -1,292 +1,178 @@
-# Project2026 – Gaming Trend Analyzer
+# Project2026 – Gaming Trend Analytics Dashboard
 
-Project2026 is a Python-based analytics project that tracks trending gaming content on YouTube and transforms it into a live gaming trend dashboard.
+A multi-source gaming analytics platform that tracks trending games across YouTube and Steam, stores historical data in PostgreSQL, and generates a live dashboard for trend analysis and visualization.
 
-The system:
-- Pulls trending gaming videos from YouTube
-- Detects which games are currently trending
-- Enriches game data using the RAWG API
-- Stores historical trend data in PostgreSQL
-- Generates a dashboard showing game momentum, metadata, and analytics
+---
 
-This project combines:
-- ETL pipelines
-- API integration
-- PostgreSQL
-- dashboard generation
-- historical trend analysis
+# Live Dashboard
+
+https://wildgoose223.github.io/Project2026-Gaming-Trend-Tracker/
 
 ---
 
 # Dashboard Features
 
-- Top 10 trending games
-- Trend movement tracking
-- Platform detection
-- Genre metadata
-- RAWG ratings
-- Metacritic scores
-- Historical trend snapshots
-- Interactive charts
-- Game artwork/background images
+- YouTube Gaming trend tracking
+- Steam player analytics
+- PostgreSQL data persistence
+- Historical snapshot storage
+- Automated dashboard updates
+- RAWG API game metadata integration
+- Trend summaries and rankings
+- Cross-platform comparison analytics
+- GitHub Pages dashboard hosting
 
 ---
 
-## Live Dashboard
+# Dashboard Overview
 
-View the live dashboard here:
+Project2026 compares:
 
-https://wildgoose223.github.io/youtube-gaming-trend-analyzer/
+- What people are watching on YouTube
+- What people are actively playing on Steam
+- Cross-platform trend overlap
+- Historical gaming trend data over time
 
-# Example Analytics Output
-
-```text
-Top 10 Trending Games Right Now:
-
-Roblox — 4 videos (16.00%)
-Trend: Stable
-Platforms: PC, PlayStation 5, Xbox, iOS, Android
-Genres: Adventure, Action, Multiplayer
-
-Rust — 2 videos (8.00%)
-Trend: Stable
-Platforms: PC, Xbox One, PlayStation 4
-Genres: Survival, Shooter, Indie
-Metacritic: 66
-```
-
----
-
-# Example Architecture
-
-```text
-YouTube API
-    ↓
-Video Title Collection
-    ↓
-Custom Alias Matching Engine
-    ↓
-RAWG Metadata Enrichment
-    ↓
-PostgreSQL Storage
-    ↓
-Dashboard Generator
-    ↓
-HTML Analytics Dashboard
-```
+The dashboard includes:
+- Trend graphs
+- Steam vs YouTube comparisons
+- Trend summaries
+- Historical rankings
+- Automated data visualization
 
 ---
 
 # Tech Stack
 
-## Languages
+## Languages & Tools
 - Python
-- SQL
+- PostgreSQL
 - HTML/CSS
+- Git/GitHub
 
 ## APIs
 - YouTube Data API v3
-- RAWG Video Game Database API
+- Steam API
+- RAWG API
 
-## Database
-- PostgreSQL
-
-## Libraries
+## Python Libraries
 - psycopg2
+- pandas
 - requests
-- google-api-python-client
 - python-dotenv
-
-## Visualization
-- Chart.js
+- matplotlib
 
 ---
 
-# Current Features
+# Project Structure
 
-## Trend Collection
-- Pulls trending gaming videos from YouTube
-- Detects games using alias matching
-- Tracks mentions and trend percentages
-
-## Metadata Enrichment
-- RAWG API integration
-- Platform detection
-- Genre lookup
-- Ratings and Metacritic scores
-- Game artwork support
-
-## Historical Analytics
-- Stores historical trend snapshots
-- Compares previous runs
-- Detects trend movement over time
-
-## Dashboard System
-- Generates a responsive HTML dashboard
-- Displays Top 10 trending games
-- Includes interactive chart visualizations
-- Displays metadata cards for each game
-
----
-
-# Folder Structure
-
-```text
 Project2026/
 │
-├── dashboard_generator.py
-├── youtube_trends_to_db.py
-├── dashboard.html
-├── build_game_library_from_rawg.py
-├── sync_game_library.py
-├── game_library.py
-├── run_log.txt
-├── .env
-├── .gitignore
-├── Images/
+├── dashboard/
+│   ├── index.html
+│   ├── dashboard_today.html
+│   ├── dashboard_week.html
+│   ├── dashboard_month.html
 │
-└── README.md
-```
+├── scripts/
+│   ├── dashboard_generator.py
+│   ├── dashboard_v2.py
+│   ├── youtube_trend_pull_v2.py
+│   ├── youtube_trends_to_db.py
+│   ├── steam_trends_to_db.py
+│   ├── build_game_library_from_rawg.py
+│   ├── build_steam_library.py
+│   ├── rawg_library_builder.py
+│   ├── sync_game_library.py
+│
+├── screenshots/
+│
+├── sql/
+│
+├── .gitignore
+├── README.md
+└── index.html
 
 ---
 
-# Setup Instructions
+# How It Works
 
-## 1. Clone Repository
+## 1. Data Collection
 
-```bash
-git clone https://github.com/Wildgoose223/youtube-gaming-trend-analyzer.git
-cd youtube-gaming-trend-analyzer
-```
-
----
-
-## 2. Install Dependencies
-
-```bash
-pip install psycopg2 requests python-dotenv google-api-python-client
-```
+The project pulls:
+- Trending gaming videos from YouTube
+- Current Steam player counts
+- Game metadata from RAWG
 
 ---
 
-## 3. Create PostgreSQL Database
+## 2. Data Processing
 
-Create a PostgreSQL database:
-
-```sql
-CREATE DATABASE YouTube_Data;
-```
-
----
-
-## 4. Configure Environment Variables
-
-Create a `.env` file in the project root:
-
-```env
-YOUTUBE_API_KEY=your_youtube_api_key
-RAWG_API_KEY=your_rawg_api_key
-DB_HOST=localhost
-DB_NAME=YouTube_Data
-DB_USER=postgres
-DB_PASSWORD=your_password
-```
+Python scripts:
+- Clean and normalize titles
+- Match games using alias libraries
+- Store results in PostgreSQL
+- Generate trend summaries
 
 ---
 
-# Database Tables
+## 3. Dashboard Generation
 
-This project uses PostgreSQL tables for:
-
-- games
-- game_aliases
-- trending_games
-- unknown_terms
-
-The `trending_games` table stores:
-- trend snapshots
-- game metadata
-- trend percentages
-- historical movement data
+The dashboard is automatically generated using:
+- HTML
+- CSS
+- Python-generated analytics data
 
 ---
 
-# Running The Project
+## 4. Historical Trend Analysis
 
-## Pull Trending Data
-
-```bash
-python youtube_trends_to_db.py
-```
-
----
-
-## Generate Dashboard
-
-```bash
-python dashboard_generator.py
-```
+The system stores snapshots over time to analyze:
+- Rising games
+- Declining games
+- Platform popularity differences
+- Long-term gaming trends
 
 ---
 
-## Open Dashboard
+# Automation
 
-Open:
-
-```text
-dashboard.html
-```
-
-in your browser.
+Project2026 supports automated scheduled updates using:
+- Windows Task Scheduler
+- Batch automation scripts
+- Daily data refresh pipelines
 
 ---
 
 # Future Improvements
 
-- Platform-specific trend filtering
-- Indie vs AAA classification
-- Historical sparkline trend charts
-- Momentum scoring
-- Daily trend summaries
-- Azure deployment
-- Live hosted dashboard
-- AI-assisted trend analysis
+Planned features include:
 - Twitch integration
-- Steam integration
-- Sentiment analysis from comments
+- Historical trend momentum
+- Interactive filters
+- Date-range selection
+- Live database hosting
+- Multilingual dashboard support
+- Trend prediction
+- AI-assisted analytics
+- Cross-platform weighted trend scoring
 
 ---
 
-# Security
+# Why This Project Exists
 
-This project uses `.env` environment variable handling to securely manage:
-- API keys
-- database credentials
-- configuration settings
+Project2026 started as a gaming trend tracker and evolved into a larger analytics platform focused on:
+- trend intelligence
+- automated analytics
+- historical tracking
+- dashboard visualization
+- cross-platform gaming insights
 
-Secrets are excluded from Git tracking using `.gitignore`.
-
----
-
-# Why This Project Matters
-
-Project2026 demonstrates:
-- ETL pipeline development
-- API integration
-- database design
-- metadata enrichment
-- dashboard generation
-- historical trend analytics
-- secure configuration handling
-- real-world debugging and system integration
-
-This project was built as part of a transition into data analytics, cloud technologies, and systems-oriented engineering work.
+The goal is to explore how entertainment, player behavior, and content trends intersect across platforms.
 
 ---
 
 # Author
-
-Samuel O'Brien
 
 GitHub:
 https://github.com/Wildgoose223
