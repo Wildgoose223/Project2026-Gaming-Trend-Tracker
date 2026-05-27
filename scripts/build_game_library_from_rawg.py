@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-RAWG_API_KEY = os.getenv("b98ba5d006134d68a332233ba36402b6")
+RAWG_API_KEY = os.getenv("RAWG_API_KEY")
 
 DB_CONFIG = {
     "host": os.getenv("DB_HOST"),
