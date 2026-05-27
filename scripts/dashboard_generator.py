@@ -200,19 +200,33 @@ def get_youtube_trends(conn, days=7, limit=10):
     return pd.read_sql(query, conn, params=(f"{days} days", limit))
 
 
-def get_steam_trends(conn, limit=10):
-    query = """
-        SELECT DISTINCT ON (LOWER(game_name))
-            LOWER(game_name) AS game_name,
-            current_players
-        FROM steam_trends
-        ORDER BY LOWER(game_name), captured_at DESC;
-    """
+def get_steam_trends(conn, days=1, limit=10):
+    if days == 1:
+        query = """
+            SELECT DISTINCT ON (LOWER(game_name))
+                LOWER(game_name) AS game_name,
+                current_players
+            FROM steam_trends
+            WHERE captured_at::date = CURRENT_DATE
+            ORDER BY LOWER(game_name), captured_at DESC;
+        """
+    else:
+        query = f"""
+            SELECT
+                LOWER(game_name) AS game_name,
+                ROUND(AVG(current_players))::int AS current_players
+            FROM steam_trends
+            WHERE captured_at >= NOW() - INTERVAL '{days} days'
+            GROUP BY LOWER(game_name)
+            ORDER BY current_players DESC
+            LIMIT {limit};
+        """
 
     try:
         df = pd.read_sql(query, conn)
         return df.sort_values("current_players", ascending=False).head(limit)
-    except Exception:
+    except Exception as e:
+        print("Steam query failed:", e)
         return pd.DataFrame(columns=["game_name", "current_players"])
 
 
@@ -466,7 +480,7 @@ def build_dashboard(days=7):
     conn = get_connection()
 
     youtube_df = get_youtube_trends(conn, days, 10)
-    steam_df = get_steam_trends(conn, 10)
+    steam_df = get_steam_trends(conn, days=days, limit=10)
     changes_df = get_latest_change(conn)
 
     conn.close()
@@ -491,7 +505,7 @@ def build_dashboard(days=7):
         steam_df,
         "game_name",
         "current_players",
-        "Steam Current Players"
+        "Steam Current Players" if days == 1 else f"Avg Steam Players - Last {days} Days"
     )
 
     cards = build_game_cards(youtube_df, steam_df, change_map)
