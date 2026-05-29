@@ -11,15 +11,8 @@ import requests
 from security_logger import log_security_event
 
 
-# =========================
-# LOAD ENV VARIABLES
-# =========================
 load_dotenv()
 
-
-# =========================
-# CONFIG
-# =========================
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 RAWG_API_KEY = os.getenv("RAWG_API_KEY")
 
@@ -43,15 +36,9 @@ if not DB_CONFIG["password"]:
     raise ValueError("Missing DB_PASSWORD in .env file")
 
 
-# =========================
-# YOUTUBE API
-# =========================
 YOUTUBE = build("youtube", "v3", developerKey=YOUTUBE_API_KEY)
 
 
-# =========================
-# GAME LIBRARY
-# =========================
 GAME_LIBRARY = {
     "minecraft": ["minecraft", "mc"],
     "roblox": ["roblox"],
@@ -74,18 +61,12 @@ GAME_LIBRARY = {
 }
 
 
-# =========================
-# CLEAN TEXT
-# =========================
 def clean_text(text):
     text = text.lower()
     text = re.sub(r"[^a-zA-Z0-9\s]", "", text)
     return text
 
 
-# =========================
-# RAWG API LOOKUP
-# =========================
 def fetch_rawg_data(game_name):
     try:
         log_security_event("RAWG_LOOKUP", f"Looking up RAWG data for {game_name}")
@@ -133,9 +114,6 @@ def fetch_rawg_data(game_name):
         return {}
 
 
-# =========================
-# FETCH TRENDING VIDEOS
-# =========================
 def fetch_trending_videos():
     log_security_event("API_PULL", "Requesting YouTube trending gaming videos")
 
@@ -144,7 +122,7 @@ def fetch_trending_videos():
         chart="mostPopular",
         regionCode="US",
         videoCategoryId="20",
-        maxResults=25
+        maxResults=50
     )
 
     response = request.execute()
@@ -160,9 +138,6 @@ def fetch_trending_videos():
     return video_titles
 
 
-# =========================
-# ANALYZE GAME TRENDS
-# =========================
 def analyze_trends(video_titles):
     log_security_event("ANALYSIS_START", "Analyzing YouTube video titles")
 
@@ -182,9 +157,6 @@ def analyze_trends(video_titles):
     return counts
 
 
-# =========================
-# SAVE TO DATABASE
-# =========================
 def save_to_database(counts, total_videos):
     log_security_event("DB_CONNECT", "Connecting to PostgreSQL")
 
@@ -236,9 +208,6 @@ def save_to_database(counts, total_videos):
     log_security_event("DB_SAVE_SUCCESS", f"Saved {len(counts)} game trend records to database")
 
 
-# =========================
-# MAIN
-# =========================
 def main():
     try:
         log_security_event("PROJECT_RUN", "YouTube trend collection started")

@@ -5,6 +5,8 @@ import requests
 import psycopg2
 from dotenv import load_dotenv
 
+from security_logger import log_security_event
+
 
 load_dotenv()
 
@@ -37,6 +39,11 @@ STEAM_GAMES = {
 
 
 def get_connection():
+    log_security_event(
+        "DB_CONNECT",
+        "Opening PostgreSQL connection for Steam trends"
+    )
+
     return psycopg2.connect(
         dbname=DB_NAME,
         user=DB_USER,
@@ -58,10 +65,21 @@ def create_table(conn):
                 captured_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         """)
+
     conn.commit()
+
+    log_security_event(
+        "DB_TABLE_CHECK",
+        "Verified steam_trends table exists"
+    )
 
 
 def get_current_players(appid):
+    log_security_event(
+        "STEAM_API_PULL",
+        f"Requesting Steam player count for appid {appid}"
+    )
+
     url = "https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/"
 
     params = {
@@ -74,7 +92,14 @@ def get_current_players(appid):
 
     data = response.json()
 
-    return data.get("response", {}).get("player_count")
+    player_count = data.get("response", {}).get("player_count")
+
+    log_security_event(
+        "STEAM_API_SUCCESS",
+        f"Received Steam player count for appid {appid}: {player_count}"
+    )
+
+    return player_count
 
 
 def save_result(conn, game_name, appid, current_players):
@@ -93,22 +118,71 @@ def save_result(conn, game_name, appid, current_players):
 
     conn.commit()
 
+    log_security_event(
+        "STEAM_DB_SAVE",
+        f"Saved Steam count for {game_name}: {current_players}"
+    )
+
 
 def main():
-    conn = get_connection()
-    create_table(conn)
+    log_security_event(
+        "STEAM_RUN",
+        "Steam trend pull started"
+    )
 
-    for game_name, appid in STEAM_GAMES.items():
-        try:
-            players = get_current_players(appid)
-            save_result(conn, game_name, appid, players)
-            print(f"{game_name}: {players} current players")
+    conn = None
+    success_count = 0
+    fail_count = 0
 
-        except Exception as e:
-            print(f"Failed for {game_name}: {e}")
+    try:
+        if not DB_PASSWORD:
+            raise ValueError("Missing DB_PASSWORD in .env file.")
 
-    conn.close()
-    print("Steam trend pull complete.")
+        conn = get_connection()
+        create_table(conn)
+
+        for game_name, appid in STEAM_GAMES.items():
+            try:
+                players = get_current_players(appid)
+                save_result(conn, game_name, appid, players)
+                success_count += 1
+
+                print(f"{game_name}: {players} current players")
+
+            except Exception as e:
+                fail_count += 1
+
+                log_security_event(
+                    "STEAM_GAME_ERROR",
+                    f"Failed for {game_name} ({appid}): {e}"
+                )
+
+                print(f"Failed for {game_name}: {e}")
+
+        log_security_event(
+            "STEAM_RUN_SUCCESS",
+            f"Steam trend pull complete. Success: {success_count}, Failed: {fail_count}"
+        )
+
+        print("Steam trend pull complete.")
+
+    except Exception as e:
+        log_security_event(
+            "STEAM_RUN_ERROR",
+            str(e)
+        )
+
+        print(f"Steam trend pull failed: {e}")
+        raise
+
+    finally:
+        if conn:
+            conn.close()
+
+            log_security_event(
+                "DB_CLOSE",
+                "Closed PostgreSQL connection for Steam trends"
+            )
 
 
 if __name__ == "__main__":
