@@ -1,4 +1,3 @@
-
 import os
 import re
 from collections import Counter
@@ -8,6 +7,8 @@ import psycopg2
 from dotenv import load_dotenv
 from googleapiclient.discovery import build
 import requests
+
+from security_logger import log_security_event
 
 
 # =========================
@@ -30,12 +31,15 @@ DB_CONFIG = {
 }
 
 if not YOUTUBE_API_KEY:
+    log_security_event("CONFIG_ERROR", "Missing YOUTUBE_API_KEY in .env file")
     raise ValueError("Missing YOUTUBE_API_KEY in .env file")
 
 if not RAWG_API_KEY:
+    log_security_event("CONFIG_ERROR", "Missing RAWG_API_KEY in .env file")
     raise ValueError("Missing RAWG_API_KEY in .env file")
 
 if not DB_CONFIG["password"]:
+    log_security_event("CONFIG_ERROR", "Missing DB_PASSWORD in .env file")
     raise ValueError("Missing DB_PASSWORD in .env file")
 
 
@@ -84,6 +88,8 @@ def clean_text(text):
 # =========================
 def fetch_rawg_data(game_name):
     try:
+        log_security_event("RAWG_LOOKUP", f"Looking up RAWG data for {game_name}")
+
         url = "https://api.rawg.io/api/games"
 
         params = {
@@ -96,6 +102,7 @@ def fetch_rawg_data(game_name):
         data = response.json()
 
         if not data.get("results"):
+            log_security_event("RAWG_LOOKUP_WARNING", f"No RAWG results found for {game_name}")
             return {}
 
         game = data["results"][0]
@@ -121,6 +128,7 @@ def fetch_rawg_data(game_name):
         }
 
     except Exception as e:
+        log_security_event("RAWG_ERROR", f"RAWG lookup failed for {game_name}: {e}")
         print(f"RAWG lookup failed for {game_name}: {e}")
         return {}
 
@@ -129,6 +137,8 @@ def fetch_rawg_data(game_name):
 # FETCH TRENDING VIDEOS
 # =========================
 def fetch_trending_videos():
+    log_security_event("API_PULL", "Requesting YouTube trending gaming videos")
+
     request = YOUTUBE.videos().list(
         part="snippet",
         chart="mostPopular",
@@ -145,6 +155,8 @@ def fetch_trending_videos():
         title = item["snippet"]["title"]
         video_titles.append(title)
 
+    log_security_event("API_PULL_SUCCESS", f"Fetched {len(video_titles)} YouTube videos")
+
     return video_titles
 
 
@@ -152,6 +164,8 @@ def fetch_trending_videos():
 # ANALYZE GAME TRENDS
 # =========================
 def analyze_trends(video_titles):
+    log_security_event("ANALYSIS_START", "Analyzing YouTube video titles")
+
     counts = Counter()
 
     for title in video_titles:
@@ -163,6 +177,8 @@ def analyze_trends(video_titles):
                     counts[game_name] += 1
                     break
 
+    log_security_event("ANALYSIS_SUCCESS", f"Matched {len(counts)} games")
+
     return counts
 
 
@@ -170,6 +186,8 @@ def analyze_trends(video_titles):
 # SAVE TO DATABASE
 # =========================
 def save_to_database(counts, total_videos):
+    log_security_event("DB_CONNECT", "Connecting to PostgreSQL")
+
     conn = psycopg2.connect(**DB_CONFIG)
     cursor = conn.cursor()
 
@@ -215,27 +233,39 @@ def save_to_database(counts, total_videos):
     cursor.close()
     conn.close()
 
+    log_security_event("DB_SAVE_SUCCESS", f"Saved {len(counts)} game trend records to database")
+
 
 # =========================
 # MAIN
 # =========================
 def main():
-    print("Fetching trending YouTube gaming videos...")
+    try:
+        log_security_event("PROJECT_RUN", "YouTube trend collection started")
 
-    video_titles = fetch_trending_videos()
+        print("Fetching trending YouTube gaming videos...")
 
-    print(f"Fetched {len(video_titles)} videos.")
+        video_titles = fetch_trending_videos()
 
-    counts = analyze_trends(video_titles)
+        print(f"Fetched {len(video_titles)} videos.")
 
-    print("\nTrending Games:")
+        counts = analyze_trends(video_titles)
 
-    for game, mentions in counts.most_common():
-        print(f"{game}: {mentions}")
+        print("\nTrending Games:")
 
-    save_to_database(counts, len(video_titles))
+        for game, mentions in counts.most_common():
+            print(f"{game}: {mentions}")
 
-    print("\nTrend data saved successfully.")
+        save_to_database(counts, len(video_titles))
+
+        print("\nTrend data saved successfully.")
+
+        log_security_event("PROJECT_RUN_SUCCESS", "YouTube trend collection completed successfully")
+
+    except Exception as e:
+        log_security_event("PROJECT_RUN_ERROR", str(e))
+        print(f"\nError: {e}")
+        raise
 
 
 if __name__ == "__main__":
