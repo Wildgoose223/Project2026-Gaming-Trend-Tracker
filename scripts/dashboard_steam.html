@@ -1,0 +1,252 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Project2026 Steam Trends</title>
+<style>
+body {
+    background:
+        radial-gradient(circle at top left, rgba(59,130,246,.30), transparent 30%),
+        linear-gradient(135deg, #020617, #07111f 50%, #0f2740);
+    color: #eff6ff;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 24px;
+}
+
+h1 {
+    color: #60a5fa;
+    margin-bottom: 4px;
+}
+
+.subtitle {
+    color: #bfdbfe;
+    margin-bottom: 18px;
+}
+
+.nav a {
+    display: inline-block;
+    background: #0f2740;
+    color: white;
+    padding: 10px 16px;
+    margin-right: 8px;
+    border-radius: 8px;
+    text-decoration: none;
+    border: 1px solid #3b82f6;
+}
+
+.panel,
+.game-card,
+.summary-card {
+    background: rgba(7,17,31,.95);
+    border: 1px solid #3b82f6;
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0,0,0,.32);
+}
+
+.summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.summary-card {
+    padding: 18px;
+    text-align: center;
+}
+
+.summary-card strong {
+    display: block;
+    font-size: 28px;
+    color: #60a5fa;
+}
+
+.summary-card span {
+    color: #bfdbfe;
+    font-size: 13px;
+}
+
+.panel {
+    padding: 18px;
+    margin-top: 22px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.game-card {
+    padding: 16px;
+}
+
+.rank {
+    color: #60a5fa;
+    font-weight: bold;
+}
+
+h3 {
+    margin: 6px 0 12px 0;
+    font-size: 22px;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.stats div {
+    background: #020617;
+    border: 1px solid #1d4ed8;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+}
+
+.stats strong {
+    display: block;
+    color: white;
+    font-size: 15px;
+}
+
+.stats span {
+    font-size: 10px;
+    color: #bfdbfe;
+}
+
+.status {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.up {
+    background: rgba(34,197,94,.15);
+    color: #4ade80;
+}
+
+.down {
+    background: rgba(239,68,68,.15);
+    color: #f87171;
+}
+
+.stable {
+    background: rgba(234,179,8,.15);
+    color: #facc15;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+}
+
+th,
+td {
+    border-bottom: 1px solid #1d4ed8;
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    color: #60a5fa;
+}
+
+@media (max-width: 1000px) {
+    .grid,
+    .summary {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<h1>Project2026 Steam Trends</h1>
+<p class="subtitle">Active player demand based on Steam current player counts and momentum.</p>
+
+<div class="nav">
+    <a href="index.html">Main</a>
+    <a href="dashboard_youtube.html">YouTube</a>
+    <a href="dashboard_steam.html">Steam</a>
+    <a href="dashboard_twitch.html">Twitch</a>
+    <a href="dashboard_kick.html">Kick</a>
+</div>
+
+<div class="summary">
+    <div class="summary-card">
+        <strong>1</strong>
+        <span>Games Tracked</span>
+    </div>
+
+    <div class="summary-card">
+        <strong>Marvel Rivals</strong>
+        <span>Top Steam Game</span>
+    </div>
+
+    <div class="summary-card">
+        <strong>59,798</strong>
+        <span>Top Player Count</span>
+    </div>
+</div>
+
+<div class="panel">
+    <h2>Steam Player Graph</h2>
+    <div>                        <script>window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.5.0.min.js" integrity="sha256-fHbNLP+GlIXN+efbQec78UkemUz3NJp7UmfGxC1tNxs=" crossorigin="anonymous"></script>                <div id="6f6edb13-0d9f-4bea-9167-6b3efcfc19bc" class="plotly-graph-div" style="height:360px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("6f6edb13-0d9f-4bea-9167-6b3efcfc19bc")) {                    Plotly.newPlot(                        "6f6edb13-0d9f-4bea-9167-6b3efcfc19bc",                        [{"hovertemplate":"game_name=%{x}\u003cbr\u003ecurrent_players=%{text}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"","marker":{"color":"#636efa","pattern":{"shape":""}},"name":"","orientation":"v","showlegend":false,"text":{"dtype":"f8","bdata":"AAAAAMAy7UA="},"textposition":"auto","x":["marvel rivals"],"xaxis":"x","y":{"dtype":"i4","bdata":"lukAAA=="},"yaxis":"y","type":"bar"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#f2f5fa"},"error_y":{"color":"#f2f5fa"},"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"baxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"line":{"color":"#283442"}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"marker":{"line":{"color":"#283442"}},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#506784"},"line":{"color":"rgb(17,17,17)"}},"header":{"fill":{"color":"#2a3f5f"},"line":{"color":"rgb(17,17,17)"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#f2f5fa","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#f2f5fa"},"geo":{"bgcolor":"rgb(17,17,17)","lakecolor":"rgb(17,17,17)","landcolor":"rgb(17,17,17)","showlakes":true,"showland":true,"subunitcolor":"#506784"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"dark"},"paper_bgcolor":"rgb(17,17,17)","plot_bgcolor":"rgb(17,17,17)","polar":{"angularaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","radialaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"yaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"zaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"}},"shapedefaults":{"line":{"color":"#f2f5fa"}},"sliderdefaults":{"bgcolor":"#C8D4E3","bordercolor":"rgb(17,17,17)","borderwidth":1,"tickwidth":0},"ternary":{"aaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"baxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","caxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"title":{"x":0.05},"updatemenudefaults":{"bgcolor":"#506784","borderwidth":0},"xaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"game_name"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"current_players"}},"legend":{"tracegroupgap":0},"title":{"text":"Top Steam Games by Current Players"},"barmode":"relative","margin":{"l":30,"r":30,"t":55,"b":40},"height":360,"paper_bgcolor":"#07111f","plot_bgcolor":"#07111f"},                        {"responsive": true}                    )                };            </script>        </div>
+</div>
+
+<div class="grid">
+    
+        <div class="game-card">
+            <div class="rank">#1</div>
+            <h3>Marvel Rivals</h3>
+
+            <div class="stats">
+                <div><strong>59,798</strong><span>Current Players</span></div>
+                <div><strong>0</strong><span>Previous Players</span></div>
+                <div><strong>+59,798</strong><span>Player Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+</div>
+
+<div class="panel">
+    <h2>Steam Momentum Table</h2>
+    <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Game</th>
+      <th>Steam App ID</th>
+      <th>Current Players</th>
+      <th>Previous Players</th>
+      <th>Player Change</th>
+      <th>% Change</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Marvel Rivals</td>
+      <td>2767030</td>
+      <td>59,798</td>
+      <td>0</td>
+      <td>+59,798</td>
+      <td>N/A</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+</body>
+</html>

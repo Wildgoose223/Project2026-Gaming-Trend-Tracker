@@ -1,0 +1,576 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Project2026 Kick Trends</title>
+<style>
+body {
+    background:
+        radial-gradient(circle at top left, rgba(83,252,24,.35), transparent 30%),
+        linear-gradient(135deg, #020d04, #061a0b 50%, #0b2a10);
+    color: #ecffe8;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 24px;
+}
+
+h1 {
+    color: #53fc18;
+    margin-bottom: 4px;
+}
+
+.subtitle {
+    color: #b8ffae;
+    margin-bottom: 18px;
+}
+
+.nav a {
+    display: inline-block;
+    background: #0b2a10;
+    color: white;
+    padding: 10px 16px;
+    margin-right: 8px;
+    border-radius: 8px;
+    text-decoration: none;
+    border: 1px solid #53fc18;
+}
+
+.panel,
+.game-card,
+.summary-card {
+    background: rgba(6,26,11,.95);
+    border: 1px solid #53fc18;
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0,0,0,.32);
+}
+
+.summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.summary-card {
+    padding: 18px;
+    text-align: center;
+}
+
+.summary-card strong {
+    display: block;
+    font-size: 28px;
+    color: #53fc18;
+}
+
+.summary-card span {
+    color: #b8ffae;
+    font-size: 13px;
+}
+
+.panel {
+    padding: 18px;
+    margin-top: 22px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.game-card {
+    padding: 16px;
+}
+
+.rank {
+    color: #53fc18;
+    font-weight: bold;
+}
+
+h3 {
+    margin: 6px 0 12px 0;
+    font-size: 22px;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.stats div {
+    background: #020d04;
+    border: 1px solid #1f7a2a;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+}
+
+.stats strong {
+    display: block;
+    color: white;
+    font-size: 15px;
+}
+
+.stats span {
+    font-size: 10px;
+    color: #b8ffae;
+}
+
+.status {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.up {
+    background: rgba(34,197,94,.15);
+    color: #4ade80;
+}
+
+.down {
+    background: rgba(239,68,68,.15);
+    color: #f87171;
+}
+
+.stable {
+    background: rgba(234,179,8,.15);
+    color: #facc15;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+}
+
+th,
+td {
+    border-bottom: 1px solid #1f7a2a;
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    color: #53fc18;
+}
+
+@media (max-width: 1000px) {
+    .grid,
+    .summary {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<h1>Project2026 Kick Trends</h1>
+<p class="subtitle">Alternative livestreaming trends based on Kick viewers, stream counts, and category momentum.</p>
+
+<div class="nav">
+    <a href="index.html">Main</a>
+    <a href="dashboard_youtube.html">YouTube</a>
+    <a href="dashboard_steam.html">Steam</a>
+    <a href="dashboard_twitch.html">Twitch</a>
+    <a href="dashboard_kick.html">Kick</a>
+</div>
+
+<div class="summary">
+    <div class="summary-card">
+        <strong>15</strong>
+        <span>Categories / Games Tracked</span>
+    </div>
+
+    <div class="summary-card">
+        <strong>Just Chatting</strong>
+        <span>Top Kick Category</span>
+    </div>
+
+    <div class="summary-card">
+        <strong>84,370</strong>
+        <span>Top Viewer Count</span>
+    </div>
+</div>
+
+<div class="panel">
+    <h2>Kick Viewer Graph</h2>
+    <div>                        <script>window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.5.0.min.js" integrity="sha256-fHbNLP+GlIXN+efbQec78UkemUz3NJp7UmfGxC1tNxs=" crossorigin="anonymous"></script>                <div id="820862d7-a92e-48b3-a44b-c2a21a5354fb" class="plotly-graph-div" style="height:360px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("820862d7-a92e-48b3-a44b-c2a21a5354fb")) {                    Plotly.newPlot(                        "820862d7-a92e-48b3-a44b-c2a21a5354fb",                        [{"hovertemplate":"game_name=%{x}\u003cbr\u003ecurrent_viewers=%{text}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"","marker":{"color":"#636efa","pattern":{"shape":""}},"name":"","orientation":"v","showlegend":false,"text":{"dtype":"f8","bdata":"AAAAACCZ9EAAAAAA4F7rQAAAAAAAwuJAAAAAAICf2kAAAAAAQN7ZQAAAAAAARNNAAAAAAADK0UAAAAAAgObJQAAAAAAA6MFAAAAAAIBnwUAAAAAAALu\u002fQAAAAAAAobxAAAAAAACaqUAAAAAAAOCmQAAAAAAAgJ1A"},"textposition":"auto","x":["just chatting","grand theft auto v (gta)","irl","counter-strike 2","slots & casino","tails noir","gothic 1 remake","dota 2","pubg mobile","league of legends","just sleeping","ea sports fc 26","garena free fire","mirror's edge","007 first light"],"xaxis":"x","y":{"dtype":"i4","bdata":"kkkBAPfaAAAQlgAAfmoAAHlnAAAQTQAAKEcAAM0zAADQIwAAzyIAALsfAAChHAAAzQwAAHALAABgBwAA"},"yaxis":"y","type":"bar"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#f2f5fa"},"error_y":{"color":"#f2f5fa"},"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"baxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"line":{"color":"#283442"}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"marker":{"line":{"color":"#283442"}},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#506784"},"line":{"color":"rgb(17,17,17)"}},"header":{"fill":{"color":"#2a3f5f"},"line":{"color":"rgb(17,17,17)"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#f2f5fa","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#f2f5fa"},"geo":{"bgcolor":"rgb(17,17,17)","lakecolor":"rgb(17,17,17)","landcolor":"rgb(17,17,17)","showlakes":true,"showland":true,"subunitcolor":"#506784"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"dark"},"paper_bgcolor":"rgb(17,17,17)","plot_bgcolor":"rgb(17,17,17)","polar":{"angularaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","radialaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"yaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"zaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"}},"shapedefaults":{"line":{"color":"#f2f5fa"}},"sliderdefaults":{"bgcolor":"#C8D4E3","bordercolor":"rgb(17,17,17)","borderwidth":1,"tickwidth":0},"ternary":{"aaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"baxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","caxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"title":{"x":0.05},"updatemenudefaults":{"bgcolor":"#506784","borderwidth":0},"xaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"game_name"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"current_viewers"}},"legend":{"tracegroupgap":0},"title":{"text":"Top Kick Categories by Current Viewers"},"barmode":"relative","margin":{"l":30,"r":30,"t":55,"b":40},"height":360,"paper_bgcolor":"#061a0b","plot_bgcolor":"#061a0b"},                        {"responsive": true}                    )                };            </script>        </div>
+</div>
+
+<div class="grid">
+    
+        <div class="game-card">
+            <div class="rank">#1</div>
+            <h3>Just Chatting</h3>
+
+            <div class="stats">
+                <div><strong>84,370</strong><span>Current Viewers</span></div>
+                <div><strong>24</strong><span>Live Streams</span></div>
+                <div><strong>+84,370</strong><span>Viewer Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#2</div>
+            <h3>Grand Theft Auto V (Gta)</h3>
+
+            <div class="stats">
+                <div><strong>56,055</strong><span>Current Viewers</span></div>
+                <div><strong>19</strong><span>Live Streams</span></div>
+                <div><strong>+56,055</strong><span>Viewer Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#3</div>
+            <h3>Irl</h3>
+
+            <div class="stats">
+                <div><strong>38,416</strong><span>Current Viewers</span></div>
+                <div><strong>18</strong><span>Live Streams</span></div>
+                <div><strong>+38,416</strong><span>Viewer Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#4</div>
+            <h3>Counter-Strike 2</h3>
+
+            <div class="stats">
+                <div><strong>27,262</strong><span>Current Viewers</span></div>
+                <div><strong>7</strong><span>Live Streams</span></div>
+                <div><strong>+27,262</strong><span>Viewer Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#5</div>
+            <h3>Slots & Casino</h3>
+
+            <div class="stats">
+                <div><strong>26,489</strong><span>Current Viewers</span></div>
+                <div><strong>5</strong><span>Live Streams</span></div>
+                <div><strong>+26,489</strong><span>Viewer Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#6</div>
+            <h3>Tails Noir</h3>
+
+            <div class="stats">
+                <div><strong>19,728</strong><span>Current Viewers</span></div>
+                <div><strong>1</strong><span>Live Streams</span></div>
+                <div><strong>+19,728</strong><span>Viewer Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#7</div>
+            <h3>Gothic 1 Remake</h3>
+
+            <div class="stats">
+                <div><strong>18,216</strong><span>Current Viewers</span></div>
+                <div><strong>3</strong><span>Live Streams</span></div>
+                <div><strong>+18,216</strong><span>Viewer Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#8</div>
+            <h3>Dota 2</h3>
+
+            <div class="stats">
+                <div><strong>13,261</strong><span>Current Viewers</span></div>
+                <div><strong>3</strong><span>Live Streams</span></div>
+                <div><strong>+13,261</strong><span>Viewer Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#9</div>
+            <h3>Pubg Mobile</h3>
+
+            <div class="stats">
+                <div><strong>9,168</strong><span>Current Viewers</span></div>
+                <div><strong>2</strong><span>Live Streams</span></div>
+                <div><strong>+9,168</strong><span>Viewer Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#10</div>
+            <h3>League Of Legends</h3>
+
+            <div class="stats">
+                <div><strong>8,911</strong><span>Current Viewers</span></div>
+                <div><strong>5</strong><span>Live Streams</span></div>
+                <div><strong>+8,911</strong><span>Viewer Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#11</div>
+            <h3>Just Sleeping</h3>
+
+            <div class="stats">
+                <div><strong>8,123</strong><span>Current Viewers</span></div>
+                <div><strong>1</strong><span>Live Streams</span></div>
+                <div><strong>+8,123</strong><span>Viewer Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#12</div>
+            <h3>Ea Sports Fc 26</h3>
+
+            <div class="stats">
+                <div><strong>7,329</strong><span>Current Viewers</span></div>
+                <div><strong>3</strong><span>Live Streams</span></div>
+                <div><strong>+7,329</strong><span>Viewer Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#13</div>
+            <h3>Garena Free Fire</h3>
+
+            <div class="stats">
+                <div><strong>3,277</strong><span>Current Viewers</span></div>
+                <div><strong>2</strong><span>Live Streams</span></div>
+                <div><strong>+3,277</strong><span>Viewer Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#14</div>
+            <h3>Mirror'S Edge</h3>
+
+            <div class="stats">
+                <div><strong>2,928</strong><span>Current Viewers</span></div>
+                <div><strong>1</strong><span>Live Streams</span></div>
+                <div><strong>+2,928</strong><span>Viewer Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#15</div>
+            <h3>007 First Light</h3>
+
+            <div class="stats">
+                <div><strong>1,888</strong><span>Current Viewers</span></div>
+                <div><strong>1</strong><span>Live Streams</span></div>
+                <div><strong>+1,888</strong><span>Viewer Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+</div>
+
+<div class="panel">
+    <h2>Kick Momentum Table</h2>
+    <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Category / Game</th>
+      <th>Current Viewers</th>
+      <th>Previous Viewers</th>
+      <th>Live Streams</th>
+      <th>Previous Streams</th>
+      <th>Viewer Change</th>
+      <th>% Change</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Just Chatting</td>
+      <td>84,370</td>
+      <td>0</td>
+      <td>24</td>
+      <td>0</td>
+      <td>+84,370</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Grand Theft Auto V (Gta)</td>
+      <td>56,055</td>
+      <td>0</td>
+      <td>19</td>
+      <td>0</td>
+      <td>+56,055</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Irl</td>
+      <td>38,416</td>
+      <td>0</td>
+      <td>18</td>
+      <td>0</td>
+      <td>+38,416</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Counter-Strike 2</td>
+      <td>27,262</td>
+      <td>0</td>
+      <td>7</td>
+      <td>0</td>
+      <td>+27,262</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Slots &amp; Casino</td>
+      <td>26,489</td>
+      <td>0</td>
+      <td>5</td>
+      <td>0</td>
+      <td>+26,489</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Tails Noir</td>
+      <td>19,728</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>+19,728</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Gothic 1 Remake</td>
+      <td>18,216</td>
+      <td>0</td>
+      <td>3</td>
+      <td>0</td>
+      <td>+18,216</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Dota 2</td>
+      <td>13,261</td>
+      <td>0</td>
+      <td>3</td>
+      <td>0</td>
+      <td>+13,261</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Pubg Mobile</td>
+      <td>9,168</td>
+      <td>0</td>
+      <td>2</td>
+      <td>0</td>
+      <td>+9,168</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>League Of Legends</td>
+      <td>8,911</td>
+      <td>0</td>
+      <td>5</td>
+      <td>0</td>
+      <td>+8,911</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Just Sleeping</td>
+      <td>8,123</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>+8,123</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Ea Sports Fc 26</td>
+      <td>7,329</td>
+      <td>0</td>
+      <td>3</td>
+      <td>0</td>
+      <td>+7,329</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Garena Free Fire</td>
+      <td>3,277</td>
+      <td>0</td>
+      <td>2</td>
+      <td>0</td>
+      <td>+3,277</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Mirror'S Edge</td>
+      <td>2,928</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>+2,928</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>007 First Light</td>
+      <td>1,888</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>+1,888</td>
+      <td>N/A</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+</body>
+</html>
