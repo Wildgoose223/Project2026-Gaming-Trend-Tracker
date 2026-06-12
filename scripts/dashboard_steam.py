@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 
 from security_logger import log_security_event
 
-
 load_dotenv()
 
 DB_NAME = os.getenv("DB_NAME", "Gaming_Trend_Tracker")
@@ -39,51 +38,33 @@ def fmt_num(value):
 
 def get_steam_momentum(conn, days=7, limit=15):
     query = """
-        WITH latest_run AS (
-            SELECT MAX(captured_at) AS latest_time
-            FROM steam_trends
-            WHERE captured_at >= NOW() - INTERVAL %s
-        ),
-        previous_run AS (
-            SELECT MAX(captured_at) AS previous_time
-            FROM steam_trends
-            WHERE captured_at < (SELECT latest_time FROM latest_run)
-              AND captured_at >= NOW() - INTERVAL %s
-        ),
-        latest AS (
+        WITH ranked AS (
             SELECT
                 LOWER(game_name) AS game_name,
                 steam_appid,
-                current_players AS current_players
+                current_players,
+                captured_at,
+                ROW_NUMBER() OVER (
+                    PARTITION BY LOWER(game_name)
+                    ORDER BY captured_at DESC
+                ) AS rn
             FROM steam_trends
-            WHERE captured_at = (SELECT latest_time FROM latest_run)
-        ),
-        previous AS (
-            SELECT
-                LOWER(game_name) AS game_name,
-                current_players AS previous_players
-            FROM steam_trends
-            WHERE captured_at = (SELECT previous_time FROM previous_run)
+            WHERE captured_at >= NOW() - (%s * INTERVAL '1 day')
         )
         SELECT
-            l.game_name,
-            l.steam_appid,
-            l.current_players,
-            COALESCE(p.previous_players, 0) AS previous_players,
-            l.current_players - COALESCE(p.previous_players, 0) AS player_change,
-            ROUND(
-                ((l.current_players - COALESCE(p.previous_players, 0))::numeric
-                / NULLIF(p.previous_players, 0)) * 100,
-                2
-            ) AS percent_change
-        FROM latest l
-        LEFT JOIN previous p
-            ON l.game_name = p.game_name
-        ORDER BY l.current_players DESC
+            game_name,
+            steam_appid,
+            current_players,
+            0 AS previous_players,
+            current_players AS player_change,
+            NULL AS percent_change
+        FROM ranked
+        WHERE rn = 1
+        ORDER BY current_players DESC
         LIMIT %s;
     """
 
-    return pd.read_sql(query, conn, params=(f"{days} days", f"{days} days", limit))
+    return pd.read_sql(query, conn, params=(days, limit))
 
 
 def trend_label(change):
@@ -106,12 +87,19 @@ def make_chart(df):
         title="Top Steam Games by Current Players"
     )
 
+    fig.update_traces(
+        texttemplate="%{text:,}",
+        textposition="outside"
+    )
+
     fig.update_layout(
-        height=360,
+        height=430,
         template="plotly_dark",
         paper_bgcolor="#07111f",
         plot_bgcolor="#07111f",
-        margin=dict(l=30, r=30, t=55, b=40)
+        margin=dict(l=30, r=30, t=60, b=90),
+        xaxis_title="Game",
+        yaxis_title="Current Players"
     )
 
     return fig.to_html(full_html=False, include_plotlyjs="cdn")
@@ -127,7 +115,8 @@ def build_cards(df):
         game = row["game_name"].title()
         players = fmt_num(row["current_players"])
         previous = fmt_num(row["previous_players"])
-        change = int(row["player_change"]) if not pd.isna(row["player_change"]) else 0
+
+        change = 0 if pd.isna(row["player_change"]) else int(row["player_change"])
         pct = row["percent_change"]
         pct_display = "N/A" if pd.isna(pct) else f"{pct:+}%"
 
@@ -157,10 +146,13 @@ def build_table(df):
         return "<p>No Steam data yet.</p>"
 
     display = df.copy()
+
     display["game_name"] = display["game_name"].str.title()
     display["current_players"] = display["current_players"].apply(fmt_num)
     display["previous_players"] = display["previous_players"].apply(fmt_num)
-    display["player_change"] = display["player_change"].apply(lambda x: f"{int(x):+,}")
+    display["player_change"] = display["player_change"].apply(
+        lambda x: "N/A" if pd.isna(x) else f"{int(x):+,}"
+    )
     display["percent_change"] = display["percent_change"].apply(
         lambda x: "N/A" if pd.isna(x) else f"{x:+}%"
     )
@@ -180,9 +172,18 @@ def build_table(df):
 def build_dashboard(days=7):
     log_security_event("STEAM_DASHBOARD_BUILD", "Building Steam dashboard")
 
-    conn = get_connection()
-    df = get_steam_momentum(conn, days=days, limit=15)
-    conn.close()
+    conn = None
+
+    try:
+        conn = get_connection()
+        df = get_steam_momentum(conn, days=days, limit=15)
+    except Exception as e:
+        log_security_event("STEAM_DASHBOARD_ERROR", str(e))
+        print(f"Steam dashboard failed: {e}")
+        return
+    finally:
+        if conn:
+            conn.close()
 
     chart_html = make_chart(df)
     cards_html = build_cards(df)
@@ -196,6 +197,7 @@ def build_dashboard(days=7):
 <html>
 <head>
 <title>Project2026 Steam Trends</title>
+
 <style>
 body {{
     background:
@@ -217,15 +219,24 @@ h1 {{
     margin-bottom: 18px;
 }}
 
+.nav {{
+    margin-bottom: 18px;
+}}
+
 .nav a {{
     display: inline-block;
     background: #0f2740;
     color: white;
     padding: 10px 16px;
     margin-right: 8px;
+    margin-bottom: 8px;
     border-radius: 8px;
     text-decoration: none;
     border: 1px solid #3b82f6;
+}}
+
+.nav a:hover {{
+    background: #1d4ed8;
 }}
 
 .panel,
@@ -263,6 +274,7 @@ h1 {{
 .panel {{
     padding: 18px;
     margin-top: 22px;
+    overflow-x: auto;
 }}
 
 .grid {{

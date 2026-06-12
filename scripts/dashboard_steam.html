@@ -3,6 +3,7 @@
 <html>
 <head>
 <title>Project2026 Steam Trends</title>
+
 <style>
 body {
     background:
@@ -24,15 +25,24 @@ h1 {
     margin-bottom: 18px;
 }
 
+.nav {
+    margin-bottom: 18px;
+}
+
 .nav a {
     display: inline-block;
     background: #0f2740;
     color: white;
     padding: 10px 16px;
     margin-right: 8px;
+    margin-bottom: 8px;
     border-radius: 8px;
     text-decoration: none;
     border: 1px solid #3b82f6;
+}
+
+.nav a:hover {
+    background: #1d4ed8;
 }
 
 .panel,
@@ -70,6 +80,7 @@ h1 {
 .panel {
     padding: 18px;
     margin-top: 22px;
+    overflow-x: auto;
 }
 
 .grid {
@@ -183,17 +194,17 @@ th {
 
 <div class="summary">
     <div class="summary-card">
-        <strong>1</strong>
+        <strong>15</strong>
         <span>Games Tracked</span>
     </div>
 
     <div class="summary-card">
-        <strong>Marvel Rivals</strong>
+        <strong>Counter-Strike 2</strong>
         <span>Top Steam Game</span>
     </div>
 
     <div class="summary-card">
-        <strong>59,798</strong>
+        <strong>1,390,012</strong>
         <span>Top Player Count</span>
     </div>
 </div>
@@ -201,19 +212,215 @@ th {
 <div class="panel">
     <h2>Steam Player Graph</h2>
     <div>                        <script>window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
-        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.5.0.min.js" integrity="sha256-fHbNLP+GlIXN+efbQec78UkemUz3NJp7UmfGxC1tNxs=" crossorigin="anonymous"></script>                <div id="6f6edb13-0d9f-4bea-9167-6b3efcfc19bc" class="plotly-graph-div" style="height:360px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("6f6edb13-0d9f-4bea-9167-6b3efcfc19bc")) {                    Plotly.newPlot(                        "6f6edb13-0d9f-4bea-9167-6b3efcfc19bc",                        [{"hovertemplate":"game_name=%{x}\u003cbr\u003ecurrent_players=%{text}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"","marker":{"color":"#636efa","pattern":{"shape":""}},"name":"","orientation":"v","showlegend":false,"text":{"dtype":"f8","bdata":"AAAAAMAy7UA="},"textposition":"auto","x":["marvel rivals"],"xaxis":"x","y":{"dtype":"i4","bdata":"lukAAA=="},"yaxis":"y","type":"bar"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#f2f5fa"},"error_y":{"color":"#f2f5fa"},"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"baxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"line":{"color":"#283442"}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"marker":{"line":{"color":"#283442"}},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#506784"},"line":{"color":"rgb(17,17,17)"}},"header":{"fill":{"color":"#2a3f5f"},"line":{"color":"rgb(17,17,17)"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#f2f5fa","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#f2f5fa"},"geo":{"bgcolor":"rgb(17,17,17)","lakecolor":"rgb(17,17,17)","landcolor":"rgb(17,17,17)","showlakes":true,"showland":true,"subunitcolor":"#506784"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"dark"},"paper_bgcolor":"rgb(17,17,17)","plot_bgcolor":"rgb(17,17,17)","polar":{"angularaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","radialaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"yaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"zaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"}},"shapedefaults":{"line":{"color":"#f2f5fa"}},"sliderdefaults":{"bgcolor":"#C8D4E3","bordercolor":"rgb(17,17,17)","borderwidth":1,"tickwidth":0},"ternary":{"aaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"baxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","caxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"title":{"x":0.05},"updatemenudefaults":{"bgcolor":"#506784","borderwidth":0},"xaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"game_name"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"current_players"}},"legend":{"tracegroupgap":0},"title":{"text":"Top Steam Games by Current Players"},"barmode":"relative","margin":{"l":30,"r":30,"t":55,"b":40},"height":360,"paper_bgcolor":"#07111f","plot_bgcolor":"#07111f"},                        {"responsive": true}                    )                };            </script>        </div>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.5.0.min.js" integrity="sha256-fHbNLP+GlIXN+efbQec78UkemUz3NJp7UmfGxC1tNxs=" crossorigin="anonymous"></script>                <div id="b0f935ae-b97d-499c-b13a-39c7599fc80d" class="plotly-graph-div" style="height:430px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("b0f935ae-b97d-499c-b13a-39c7599fc80d")) {                    Plotly.newPlot(                        "b0f935ae-b97d-499c-b13a-39c7599fc80d",                        [{"hovertemplate":"game_name=%{x}\u003cbr\u003ecurrent_players=%{text}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"","marker":{"color":"#636efa","pattern":{"shape":""}},"name":"","orientation":"v","showlegend":false,"text":{"dtype":"f8","bdata":"AAAAALw1NUEAAAAAXu0kQQAAAADCsSNBAAAAAECwCkEAAAAAUFYBQQAAAACQ8fdAAAAAANDU9kAAAAAAsFL2QAAAAABwj\u002fRAAAAAAPAY8UAAAAAAgO3wQAAAAABA\u002fOlAAAAAAAAq5EAAAAAAQA7kQAAAAACAC+RA"},"textposition":"outside","x":["counter-strike 2","pubg","dota 2","apex legends","rust","grand theft auto","stardew valley","destiny 2","marvel rivals","rainbow six siege","warframe","team fortress 2","palworld","elden ring","baldur's gate 3"],"xaxis":"x","y":{"dtype":"i4","bdata":"vDUVAK92CgDh2AkACFYDAMoqAgAZfwEATW0BACtlAQD3SAEAjxEBANgOAQDizwAAUKEAAHKgAABcoAAA"},"yaxis":"y","type":"bar","texttemplate":"%{text:,}"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#f2f5fa"},"error_y":{"color":"#f2f5fa"},"marker":{"line":{"color":"rgb(17,17,17)","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"baxis":{"endlinecolor":"#A2B1C6","gridcolor":"#506784","linecolor":"#506784","minorgridcolor":"#506784","startlinecolor":"#A2B1C6"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"line":{"color":"#283442"}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"marker":{"line":{"color":"#283442"}},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#506784"},"line":{"color":"rgb(17,17,17)"}},"header":{"fill":{"color":"#2a3f5f"},"line":{"color":"rgb(17,17,17)"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#f2f5fa","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#f2f5fa"},"geo":{"bgcolor":"rgb(17,17,17)","lakecolor":"rgb(17,17,17)","landcolor":"rgb(17,17,17)","showlakes":true,"showland":true,"subunitcolor":"#506784"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"dark"},"paper_bgcolor":"rgb(17,17,17)","plot_bgcolor":"rgb(17,17,17)","polar":{"angularaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","radialaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"yaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"},"zaxis":{"backgroundcolor":"rgb(17,17,17)","gridcolor":"#506784","gridwidth":2,"linecolor":"#506784","showbackground":true,"ticks":"","zerolinecolor":"#C8D4E3"}},"shapedefaults":{"line":{"color":"#f2f5fa"}},"sliderdefaults":{"bgcolor":"#C8D4E3","bordercolor":"rgb(17,17,17)","borderwidth":1,"tickwidth":0},"ternary":{"aaxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"baxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""},"bgcolor":"rgb(17,17,17)","caxis":{"gridcolor":"#506784","linecolor":"#506784","ticks":""}},"title":{"x":0.05},"updatemenudefaults":{"bgcolor":"#506784","borderwidth":0},"xaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"#283442","linecolor":"#506784","ticks":"","title":{"standoff":15},"zerolinecolor":"#283442","zerolinewidth":2}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Game"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Current Players"}},"legend":{"tracegroupgap":0},"title":{"text":"Top Steam Games by Current Players"},"barmode":"relative","margin":{"l":30,"r":30,"t":60,"b":90},"height":430,"paper_bgcolor":"#07111f","plot_bgcolor":"#07111f"},                        {"responsive": true}                    )                };            </script>        </div>
 </div>
 
 <div class="grid">
     
         <div class="game-card">
             <div class="rank">#1</div>
+            <h3>Counter-Strike 2</h3>
+
+            <div class="stats">
+                <div><strong>1,390,012</strong><span>Current Players</span></div>
+                <div><strong>0</strong><span>Previous Players</span></div>
+                <div><strong>+1,390,012</strong><span>Player Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#2</div>
+            <h3>Pubg</h3>
+
+            <div class="stats">
+                <div><strong>685,743</strong><span>Current Players</span></div>
+                <div><strong>0</strong><span>Previous Players</span></div>
+                <div><strong>+685,743</strong><span>Player Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#3</div>
+            <h3>Dota 2</h3>
+
+            <div class="stats">
+                <div><strong>645,345</strong><span>Current Players</span></div>
+                <div><strong>0</strong><span>Previous Players</span></div>
+                <div><strong>+645,345</strong><span>Player Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#4</div>
+            <h3>Apex Legends</h3>
+
+            <div class="stats">
+                <div><strong>218,632</strong><span>Current Players</span></div>
+                <div><strong>0</strong><span>Previous Players</span></div>
+                <div><strong>+218,632</strong><span>Player Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#5</div>
+            <h3>Rust</h3>
+
+            <div class="stats">
+                <div><strong>142,026</strong><span>Current Players</span></div>
+                <div><strong>0</strong><span>Previous Players</span></div>
+                <div><strong>+142,026</strong><span>Player Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#6</div>
+            <h3>Grand Theft Auto</h3>
+
+            <div class="stats">
+                <div><strong>98,073</strong><span>Current Players</span></div>
+                <div><strong>0</strong><span>Previous Players</span></div>
+                <div><strong>+98,073</strong><span>Player Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#7</div>
+            <h3>Stardew Valley</h3>
+
+            <div class="stats">
+                <div><strong>93,517</strong><span>Current Players</span></div>
+                <div><strong>0</strong><span>Previous Players</span></div>
+                <div><strong>+93,517</strong><span>Player Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#8</div>
+            <h3>Destiny 2</h3>
+
+            <div class="stats">
+                <div><strong>91,435</strong><span>Current Players</span></div>
+                <div><strong>0</strong><span>Previous Players</span></div>
+                <div><strong>+91,435</strong><span>Player Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#9</div>
             <h3>Marvel Rivals</h3>
 
             <div class="stats">
-                <div><strong>59,798</strong><span>Current Players</span></div>
+                <div><strong>84,215</strong><span>Current Players</span></div>
                 <div><strong>0</strong><span>Previous Players</span></div>
-                <div><strong>+59,798</strong><span>Player Change</span></div>
+                <div><strong>+84,215</strong><span>Player Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#10</div>
+            <h3>Rainbow Six Siege</h3>
+
+            <div class="stats">
+                <div><strong>70,031</strong><span>Current Players</span></div>
+                <div><strong>0</strong><span>Previous Players</span></div>
+                <div><strong>+70,031</strong><span>Player Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#11</div>
+            <h3>Warframe</h3>
+
+            <div class="stats">
+                <div><strong>69,336</strong><span>Current Players</span></div>
+                <div><strong>0</strong><span>Previous Players</span></div>
+                <div><strong>+69,336</strong><span>Player Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#12</div>
+            <h3>Team Fortress 2</h3>
+
+            <div class="stats">
+                <div><strong>53,218</strong><span>Current Players</span></div>
+                <div><strong>0</strong><span>Previous Players</span></div>
+                <div><strong>+53,218</strong><span>Player Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#13</div>
+            <h3>Palworld</h3>
+
+            <div class="stats">
+                <div><strong>41,296</strong><span>Current Players</span></div>
+                <div><strong>0</strong><span>Previous Players</span></div>
+                <div><strong>+41,296</strong><span>Player Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#14</div>
+            <h3>Elden Ring</h3>
+
+            <div class="stats">
+                <div><strong>41,074</strong><span>Current Players</span></div>
+                <div><strong>0</strong><span>Previous Players</span></div>
+                <div><strong>+41,074</strong><span>Player Change</span></div>
+                <div><strong>N/A</strong><span>% Change</span></div>
+            </div>
+
+            <div class="status up">Trending Up</div>
+        </div>
+        
+        <div class="game-card">
+            <div class="rank">#15</div>
+            <h3>Baldur'S Gate 3</h3>
+
+            <div class="stats">
+                <div><strong>41,052</strong><span>Current Players</span></div>
+                <div><strong>0</strong><span>Previous Players</span></div>
+                <div><strong>+41,052</strong><span>Player Change</span></div>
                 <div><strong>N/A</strong><span>% Change</span></div>
             </div>
 
@@ -237,11 +444,123 @@ th {
   </thead>
   <tbody>
     <tr>
+      <td>Counter-Strike 2</td>
+      <td>730</td>
+      <td>1,390,012</td>
+      <td>0</td>
+      <td>+1,390,012</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Pubg</td>
+      <td>578080</td>
+      <td>685,743</td>
+      <td>0</td>
+      <td>+685,743</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Dota 2</td>
+      <td>570</td>
+      <td>645,345</td>
+      <td>0</td>
+      <td>+645,345</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Apex Legends</td>
+      <td>1172470</td>
+      <td>218,632</td>
+      <td>0</td>
+      <td>+218,632</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Rust</td>
+      <td>252490</td>
+      <td>142,026</td>
+      <td>0</td>
+      <td>+142,026</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Grand Theft Auto</td>
+      <td>271590</td>
+      <td>98,073</td>
+      <td>0</td>
+      <td>+98,073</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Stardew Valley</td>
+      <td>413150</td>
+      <td>93,517</td>
+      <td>0</td>
+      <td>+93,517</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Destiny 2</td>
+      <td>1085660</td>
+      <td>91,435</td>
+      <td>0</td>
+      <td>+91,435</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
       <td>Marvel Rivals</td>
       <td>2767030</td>
-      <td>59,798</td>
+      <td>84,215</td>
       <td>0</td>
-      <td>+59,798</td>
+      <td>+84,215</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Rainbow Six Siege</td>
+      <td>359550</td>
+      <td>70,031</td>
+      <td>0</td>
+      <td>+70,031</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Warframe</td>
+      <td>230410</td>
+      <td>69,336</td>
+      <td>0</td>
+      <td>+69,336</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Team Fortress 2</td>
+      <td>440</td>
+      <td>53,218</td>
+      <td>0</td>
+      <td>+53,218</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Palworld</td>
+      <td>1623730</td>
+      <td>41,296</td>
+      <td>0</td>
+      <td>+41,296</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Elden Ring</td>
+      <td>1245620</td>
+      <td>41,074</td>
+      <td>0</td>
+      <td>+41,074</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Baldur'S Gate 3</td>
+      <td>1086940</td>
+      <td>41,052</td>
+      <td>0</td>
+      <td>+41,052</td>
       <td>N/A</td>
     </tr>
   </tbody>
